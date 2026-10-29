@@ -1,0 +1,94 @@
+{
+  "name": "СменаПульс (SmenaPulse) — Оперативный журнал смены v1.0",
+  "short_name": "СменаПульс v1.0",
+  "description": "Автономный оперативный журнал смены, учёт сбоев, база знаний, чек-листы обхода и облачная синхронизация через Google Таблицы (Offline-First PWA)",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0E1316",
+  "theme_color": "#F2F4F3",
+  "lang": "ru",
+  "dir": "ltr",
+  "categories": [
+    "productivity",
+    "utilities",
+    "business"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Новая запись сбоя",
+      "short_name": "Сбой",
+      "description": "Зафиксировать сбой в журнале смены",
+      "url": "./index.html?action=new-incident",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "База знаний",
+      "short_name": "Знания",
+      "description": "Регламенты и проверенные решения",
+      "url": "./index.html?action=kb",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Смена и обход",
+      "short_name": "Смена",
+      "description": "Передача смены, задачи и чек-лист обхода",
+      "url": "./index.html?action=checklists",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Справка (Help)",
+      "short_name": "Справка",
+      "description": "Описание функционала и горячие клавиши",
+      "url": "./index.html?action=help",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
