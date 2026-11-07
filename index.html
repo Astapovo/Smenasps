@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>SmenaSps · Оперативный журнал смены v1.01</title>
-<meta name="apple-mobile-web-app-title" content="SmenaSps v1.01">
-<meta name="application-name" content="SmenaSps v1.01">
+<title>SmenaSps · Оперативный журнал смены v1.1</title>
+<meta name="apple-mobile-web-app-title" content="SmenaSps v1.1">
+<meta name="application-name" content="SmenaSps v1.1">
 <meta name="description" content="Универсальный инженерный терминал, сменный журнал отказов, чек-листы обхода и База Знаний службы АСУ ТП и КИПиА (Offline-First PWA)">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
@@ -37,11 +37,13 @@
   document.documentElement.setAttribute("data-theme",t);
   var pw=localStorage.getItem("smenasps_pc_width")||"wide";
   document.documentElement.setAttribute("data-pc-width",pw);
+ var isSa = (window.matchMedia && (window.matchMedia("(display-mode: standalone)").matches || window.matchMedia("(display-mode: window-controls-overlay)").matches || window.matchMedia("(display-mode: fullscreen)").matches || window.matchMedia("(display-mode: minimal-ui)").matches)) || window.navigator.standalone === true || (document.referrer && document.referrer.indexOf("android-app://") === 0) || localStorage.getItem("smenasps_pwa_installed") === "true";
+ if(isSa){document.documentElement.setAttribute("data-pwa-installed","true");}
 }catch(e){}})();
 </script>
 <style>
 /* ==========================================================================
-   SmenaSps v1.01 — Универсальный терминал инженера АСУ ТП и КИПиА
+   SmenaSps v1.1 — Универсальный терминал инженера АСУ ТП и КИПиА
    Дизайн-система: «Сигнальная башня»
    День = светлая «напольная» тема, ночь = тёмная. Тема следует за сменой.
    Статусы говорят языком светофорных колонн (andon): красный — стоит,
@@ -1722,6 +1724,92 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
 .settings-cat-card.active-single .settings-cat-body {
   display: block;
 }
+
+/* Железное скрытие кнопки, плитки и карточки «Установить PWA», когда приложение уже установлено */
+html[data-pwa-installed="true"] .pwa-only-if-not-installed,
+html[data-pwa-installed="true"] #hubTilePwaInstall,
+html[data-pwa-installed="true"] #popTilePwaInstall,
+html[data-pwa-installed="true"] #miniBtnPwaInstall,
+html[data-pwa-installed="true"] #scat-pwa_install {
+  display: none !important;
+}
+@media (display-mode: standalone), (display-mode: window-controls-overlay), (display-mode: fullscreen), (display-mode: minimal-ui) {
+  .pwa-only-if-not-installed,
+  #hubTilePwaInstall,
+  #popTilePwaInstall,
+  #miniBtnPwaInstall,
+  #scat-pwa_install {
+    display: none !important;
+  }
+}
+
+/* Индикатор доступного обновления на кнопке Справки (?) в шапке */
+.icon-btn .dot.upd {
+  background: var(--sig);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 8px var(--sig);
+  animation: pulseUpdDot 1.8s infinite ease-in-out;
+}
+@keyframes pulseUpdDot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+/* Виджет проверки обновлений и релизов GitHub в окне Справки (?) */
+.help-update-banner {
+  border: 1.5px solid var(--line-2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: var(--raise);
+  transition: border-color .2s, background .2s;
+}
+.help-update-banner.has-update {
+  border-color: var(--sig-ink);
+  background: color-mix(in srgb, var(--sig) 16%, var(--raise));
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+}
+.help-update-banner.up-to-date {
+  border-color: color-mix(in srgb, var(--grn) 45%, var(--line-2));
+}
+.help-update-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.help-update-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 15.5px/1.2 var(--f-disp);
+  color: var(--ink);
+}
+.help-update-meta {
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+.help-update-notes {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px dashed var(--line-2);
+  font-size: 12.5px;
+  color: var(--ink);
+  white-space: pre-line;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.help-update-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
 </style>
 </head>
 <body id="appBody" data-view="journal">
@@ -1779,7 +1867,7 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
     <button type="button" id="toastAction" hidden=""></button>
 </div>
 
-<!-- ШАПКА ЖУРНАЛА SmenaSps v1.01 -->
+<!-- ШАПКА ЖУРНАЛА СМЕНАПУЛЬС V1.0 -->
 <header class="appbar">
     <div class="brand">
         <div class="tower boot" id="tower" data-state="ok" role="img" aria-label="Состояние линии: штатно">
@@ -1789,7 +1877,7 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
             <h1 class="brand-title">
                 <span class="brand-title-full" id="brandTitleFull">SmenaSps · Журнал смены</span>
                 <span class="brand-title-compact" id="brandTitleCompact">SmenaSps</span>
-                <span class="brand-ver-badge">v1.0</span>
+                <span class="brand-ver-badge" id="headerAppVersionBadge">v1.1</span>
                 <button type="button" id="demoModeBadge" class="demo-badge" style="display:none" onclick="openHelpModal('setup')" title="Включён обучающий демо-режим. Нажмите для настройки">ОБУЧЕНИЕ</button>
                 <span class="root-badge">ROOT</span>
                 <span id="netOfflineBadge" class="badge badge-warning" style="display:none;font-size:10px;padding:1px 5px;vertical-align:middle">ОФЛАЙН</span>
@@ -1802,8 +1890,8 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
         </div>
     </div>
     <div class="appbar-actions">
-        <button type="button" class="icon-btn" id="btnHeaderHelp" onclick="openHelpModal()" aria-label="Справка и описание функционала" title="Справка и инструкция (Alt+H)">
-            <svg class="i" aria-hidden="true"><use href="#i-help"></use></svg>
+        <button type="button" class="icon-btn" id="btnHeaderHelp" onclick="openHelpModal()" aria-label="Справка и проверка обновлений" title="Справка, руководство и проверка обновлений (Alt+H)">
+            <svg class="i" aria-hidden="true"><use href="#i-help"></use></svg><span class="dot upd" id="helpUpdateDot" hidden=""></span>
         </button>
         <button type="button" class="icon-btn" id="btnHeaderSync" onclick="syncWithCloud()" aria-label="Синхронизировать с Google Таблицей" title="Синхронизировать с облаком">
             <svg class="i" aria-hidden="true"><use href="#i-refresh"></use></svg><span class="dot off" id="syncDot" hidden=""></span>
@@ -2005,15 +2093,25 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
     </div>
 
     <div class="panel">
-        <div class="panel-head"><h2>Отчёты по смене</h2></div>
-        <button type="button" class="action" onclick="copyShiftSummary()">
+        <div class="panel-head"><h2>Выгрузка в локальный Excel (шаблон 11 колонок) и отчёты</h2></div>
+        <button type="button" class="action" onclick="copyExcelTableRows(true)">
+            <span class="action-ico"><svg class="i" aria-hidden="true"><use href="#i-table"></use></svg></span>
+            <span class="action-text"><strong>Скопировать таблицу смены для вставки в Excel (Ctrl+V)</strong><span>Готовые строки за текущую смену (11 колонок: Дата ДД.ММ.ГГГГ | Начало | Окончание | ЧЧ:ММ | Оборудование | Зона | Узел | Описание | ФИО | Статус | Код).</span></span>
+            <span class="go"><svg class="i" aria-hidden="true"><use href="#i-chev-r"></use></svg></span>
+        </button>
+        <button type="button" class="action" onclick="copyExcelTableRows(false)">
             <span class="action-ico"><svg class="i" aria-hidden="true"><use href="#i-copy"></use></svg></span>
-            <span class="action-text"><strong>Скопировать сводку смены</strong><span>Текст для мессенджера: сбои, простой, статусы.</span></span>
+            <span class="action-text"><strong>Скопировать весь журнал для вставки в Excel (Ctrl+V)</strong><span>Все записи журнала в буфер обмена (11 колонок с табуляцией) — просто нажмите Ctrl+V в ячейке Excel.</span></span>
             <span class="go"><svg class="i" aria-hidden="true"><use href="#i-chev-r"></use></svg></span>
         </button>
         <button type="button" class="action" onclick="exportToCSV()">
-            <span class="action-ico"><svg class="i" aria-hidden="true"><use href="#i-table"></use></svg></span>
-            <span class="action-text"><strong>Журнал в CSV</strong><span>Все записи для Excel, разделитель «;».</span></span>
+            <span class="action-ico"><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg></span>
+            <span class="action-text"><strong>Скачать таблицу для Excel (.CSV — 11 колонок)</strong><span>Готовый файл для Microsoft Excel в формате: 06.11.2026 | 16:35 | 16:40 | 00:05 | Оборудование | Зона | Узел | Описание | ФИО | Статус | Код.</span></span>
+            <span class="go"><svg class="i" aria-hidden="true"><use href="#i-chev-r"></use></svg></span>
+        </button>
+        <button type="button" class="action" onclick="copyShiftSummary()">
+            <span class="action-ico"><svg class="i" aria-hidden="true"><use href="#i-copy"></use></svg></span>
+            <span class="action-text"><strong>Скопировать текстовую сводку смены</strong><span>Текст для мессенджера: сбои, простой, статусы.</span></span>
             <span class="go"><svg class="i" aria-hidden="true"><use href="#i-chev-r"></use></svg></span>
         </button>
         <button type="button" class="action" onclick="exportToJSON()">
@@ -2214,7 +2312,7 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
             </div>
 
             <!-- КАТЕГОРИЯ 4: УСТАНОВКА ПРИЛОЖЕНИЯ (PWA) — ОТОБРАЖАЕТСЯ ТОЛЬКО ЕСЛИ PWA НЕ УСТАНОВЛЕНО -->
-            <div class="settings-cat-card" data-scat-card="pwa_install" id="scat-pwa_install">
+            <div class="settings-cat-card pwa-only-if-not-installed" data-scat-card="pwa_install" id="scat-pwa_install">
                 <div class="settings-cat-head">
                     <div class="settings-cat-head-left">
                         <span class="settings-cat-ico"><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg></span>
@@ -2228,7 +2326,7 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
                     </div>
                 </div>
                 <div class="settings-cat-body">
-                    <p class="lead">Установите <b>SmenaSps v1.01</b> на главный экран вашего смартфона, планшета или ПК. После установки приложение открывается мгновенно на весь экран без адресной строки браузера и работает на 100% офлайн.</p>
+                    <p class="lead">Установите <b>SmenaSps v1.1</b> на главный экран вашего смартфона, планшета или ПК. После установки приложение открывается мгновенно на весь экран без адресной строки браузера и работает на 100% офлайн.</p>
                     <div id="pwaInstallContainer">
                         <button type="button" id="btnPwaInstall" class="btn btn-primary btn-block" onclick="promptPwaInstall()">
                             <svg class="i" aria-hidden="true"><use href="#i-download"></use></svg> Установить приложение на устройство
@@ -3025,7 +3123,7 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
                 <b>Код файла Code.gs</b>
                 <button type="button" class="btn btn-sm btn-primary" onclick="copyGoogleScriptCode()"><svg class="i" aria-hidden="true"><use href="#i-copy"></use></svg> Скопировать скрипт</button>
             </div>
-            <pre class="code" id="googleScriptCodeBlock">// === Google Apps Script: Code.gs (Единый облачный скрипт SmenaSps v1.01 — Delta Sync &amp; Multi-Engineer Edition) ===
+            <pre class="code" id="googleScriptCodeBlock">// === Google Apps Script: Code.gs (Единый облачный скрипт SmenaSps v1.0 — Delta Sync &amp; Multi-Engineer Edition) ===
 // Поддерживает:
 // 1. Журнал инцидентов (лист «Журнал») — дельта-синхронизация, защита от перезаписи статусов («Устранено»), дедупликация, разрешение конфликтов
 // 2. Сменные сообщения и задачи (лист «Смена_Сообщения») — двусторонняя дельта-синхронизация и статусы задач
@@ -3038,27 +3136,27 @@ html[data-pc-width="full"]     { --pc-max-w: 100%; }
 // - Автоматическая дедупликация задвоенных записей (по ID и Коду инцидента) с приоритетом статуса «Устранено»
 // - Нормализация дат и времени (защита от превращения времени в 30.12.1899 в ячейках Google Таблиц)
 
-const SHEET_JOURNAL = "Журнал";
-const SHEET_SHIFT = "Смена_Сообщения";
-const SHEET_NOTES = "Практические_решения";
-const SHEET_META = "Служебный_Мета";
-const DEFAULT_TZ = "Europe/Moscow";
+const SHEET_JOURNAL = &quot;Журнал&quot;;
+const SHEET_SHIFT = &quot;Смена_Сообщения&quot;;
+const SHEET_NOTES = &quot;Практические_решения&quot;;
+const SHEET_META = &quot;Служебный_Мета&quot;;
+const DEFAULT_TZ = &quot;Europe/Moscow&quot;;
 
 function sanitize(val) {
-  if (val === null || val === undefined) return "";
+  if (val === null || val === undefined) return &quot;&quot;;
   var s = String(val);
   if (/^[\=\+\-\@\t\r]/.test(s)) {
-    return "'" + s;
+    return &quot;&#x27;&quot; + s;
   }
   return s;
 }
 
 // Защита строковых дат (YYYY-MM-DD) и времени (HH:MM) от автопреобразования Google Таблицей в объект Date 1899 года
 function sanitizeDateOrTime(val) {
-  if (val === null || val === undefined) return "";
-  var s = String(val).trim().replace(/^'/, "");
-  if (!s) return "";
-  return "'" + s;
+  if (val === null || val === undefined) return &quot;&quot;;
+  var s = String(val).trim().replace(/^&#x27;/, &quot;&quot;);
+  if (!s) return &quot;&quot;;
+  return &quot;&#x27;&quot; + s;
 }
 
 function getSpreadsheetTz(ss) {
@@ -3070,52 +3168,52 @@ function getSpreadsheetTz(ss) {
 }
 
 function normalizeSheetDate(val, tz) {
-  if (val === null || val === undefined || val === "") return "";
-  if (Object.prototype.toString.call(val) === "[object Date]" &amp;&amp; !isNaN(val.getTime())) {
-    return Utilities.formatDate(val, tz || DEFAULT_TZ, "yyyy-MM-dd");
+  if (val === null || val === undefined || val === &quot;&quot;) return &quot;&quot;;
+  if (Object.prototype.toString.call(val) === &quot;[object Date]&quot; &amp;&amp; !isNaN(val.getTime())) {
+    return Utilities.formatDate(val, tz || DEFAULT_TZ, &quot;yyyy-MM-dd&quot;);
   }
-  var s = String(val).trim().replace(/^'/, "");
+  var s = String(val).trim().replace(/^&#x27;/, &quot;&quot;);
   var iso = s.match(/(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return iso[0];
   var ru = s.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
-  if (ru) return ru[3] + "-" + ("0" + ru[2]).slice(-2) + "-" + ("0" + ru[1]).slice(-2);
+  if (ru) return ru[3] + &quot;-&quot; + (&quot;0&quot; + ru[2]).slice(-2) + &quot;-&quot; + (&quot;0&quot; + ru[1]).slice(-2);
   var months = {
-    Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
-    Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
+    Jan: &quot;01&quot;, Feb: &quot;02&quot;, Mar: &quot;03&quot;, Apr: &quot;04&quot;, May: &quot;05&quot;, Jun: &quot;06&quot;,
+    Jul: &quot;07&quot;, Aug: &quot;08&quot;, Sep: &quot;09&quot;, Oct: &quot;10&quot;, Nov: &quot;11&quot;, Dec: &quot;12&quot;
   };
   var eng1 = s.match(/([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})/);
-  if (eng1 &amp;&amp; months[eng1[1]]) return eng1[3] + "-" + months[eng1[1]] + "-" + ("0" + eng1[2]).slice(-2);
+  if (eng1 &amp;&amp; months[eng1[1]]) return eng1[3] + &quot;-&quot; + months[eng1[1]] + &quot;-&quot; + (&quot;0&quot; + eng1[2]).slice(-2);
   var eng2 = s.match(/(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/);
-  if (eng2 &amp;&amp; months[eng2[2]]) return eng2[3] + "-" + months[eng2[2]] + "-" + ("0" + eng2[1]).slice(-2);
+  if (eng2 &amp;&amp; months[eng2[2]]) return eng2[3] + &quot;-&quot; + months[eng2[2]] + &quot;-&quot; + (&quot;0&quot; + eng2[1]).slice(-2);
   return s;
 }
 
 function normalizeSheetTime(val, tz) {
-  if (val === null || val === undefined || val === "") return "";
-  if (Object.prototype.toString.call(val) === "[object Date]" &amp;&amp; !isNaN(val.getTime())) {
-    return Utilities.formatDate(val, tz || DEFAULT_TZ, "HH:mm");
+  if (val === null || val === undefined || val === &quot;&quot;) return &quot;&quot;;
+  if (Object.prototype.toString.call(val) === &quot;[object Date]&quot; &amp;&amp; !isNaN(val.getTime())) {
+    return Utilities.formatDate(val, tz || DEFAULT_TZ, &quot;HH:mm&quot;);
   }
-  var s = String(val).trim().replace(/^'/, "");
+  var s = String(val).trim().replace(/^&#x27;/, &quot;&quot;);
   var m = s.match(/(\d{1,2}):(\d{2})/);
-  if (m) return ("0" + m[1]).slice(-2) + ":" + m[2];
+  if (m) return (&quot;0&quot; + m[1]).slice(-2) + &quot;:&quot; + m[2];
   return s;
 }
 
 function normalizeSheetIso(val, tz) {
-  if (val === null || val === undefined || val === "") return "";
-  if (Object.prototype.toString.call(val) === "[object Date]" &amp;&amp; !isNaN(val.getTime())) {
+  if (val === null || val === undefined || val === &quot;&quot;) return &quot;&quot;;
+  if (Object.prototype.toString.call(val) === &quot;[object Date]&quot; &amp;&amp; !isNaN(val.getTime())) {
     return val.toISOString();
   }
-  return String(val).trim().replace(/^'/, "");
+  return String(val).trim().replace(/^&#x27;/, &quot;&quot;);
 }
 
 function parseTs(val) {
   if (!val) return 0;
-  if (typeof val === "number") return isNaN(val) ? 0 : val;
-  if (Object.prototype.toString.call(val) === "[object Date]") {
+  if (typeof val === &quot;number&quot;) return isNaN(val) ? 0 : val;
+  if (Object.prototype.toString.call(val) === &quot;[object Date]&quot;) {
     return isNaN(val.getTime()) ? 0 : val.getTime();
   }
-  var s = String(val).trim().replace(/^'/, "");
+  var s = String(val).trim().replace(/^&#x27;/, &quot;&quot;);
   if (!s) return 0;
   var num = Number(s);
   if (!isNaN(num) &amp;&amp; num &gt; 1000000000000) return num;
@@ -3125,18 +3223,59 @@ function parseTs(val) {
 
 // Генерация стабильного ID для старых строк таблицы, у которых не был заполнен столбец A (ID)
 function ensureDeterministicId(id, code, date, timeStart, equipment) {
-  var cleanId = String(id || "").trim().replace(/^'/, "");
+  var cleanId = String(id || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;);
   if (cleanId) return cleanId;
-  var rawKey = [String(code || "").trim(), String(date || "").trim(), String(timeStart || "").trim(), String(equipment || "").trim()].join("|");
-  var slug = rawKey.replace(/[^a-zA-Z0-9А-Яа-яЁё]/g, "_").replace(/_+/g, "_").replace(/^_|_$/g, "");
-  return "inc-auto-" + (slug || "row");
+  var rawKey = [String(code || &quot;&quot;).trim(), String(date || &quot;&quot;).trim(), String(timeStart || &quot;&quot;).trim(), String(equipment || &quot;&quot;).trim()].join(&quot;|&quot;);
+  var slug = rawKey.replace(/[^a-zA-Z0-9А-Яа-яЁё]/g, &quot;_&quot;).replace(/_+/g, &quot;_&quot;).replace(/^_|_$/g, &quot;&quot;);
+  return &quot;inc-auto-&quot; + (slug || &quot;row&quot;);
 }
 
 function statusRank(st) {
-  var s = String(st || "В работе").trim();
-  if (s === "Устранено") return 3;
-  if (s === "Ожидает ЗИП" || s === "Передано подрядчику") return 2;
-  return 1; // "В работе"
+  var s = String(st || &quot;В работе&quot;).trim();
+  if (s === &quot;Устранено&quot;) return 3;
+  if (s === &quot;Ожидает ЗИП&quot; || s === &quot;Передано подрядчику&quot;) return 2;
+  return 1; // &quot;В работе&quot;
+}
+
+
+// Автоматическое формирование красивого листа «Экспорт_Excel» (11 колонок по стандарту локального журнала Excel)
+function rebuildExcelExportSheet(ss, allIncidents) {
+  try {
+    var headers = [&quot;Дата&quot;, &quot;Начало&quot;, &quot;Окончание&quot;, &quot;Простой&quot;, &quot;Оборудование&quot;, &quot;Участок / Зона&quot;, &quot;Узел / №&quot;, &quot;Описание и выполненные работы&quot;, &quot;ФИО специалиста&quot;, &quot;Статус&quot;, &quot;Код&quot;];
+    var sh = getOrCreateSheet(ss, &quot;Экспорт_Excel&quot;, headers);
+    var sorted = allIncidents.slice().sort(function(a, b) {
+      var da = String(a.date || &quot;&quot;) + &quot; &quot; + String(a.timeStart || &quot;00:00&quot;);
+      var db = String(b.date || &quot;&quot;) + &quot; &quot; + String(b.timeStart || &quot;00:00&quot;);
+      return da &lt; db ? -1 : (da &gt; db ? 1 : 0);
+    });
+    var rows = [headers];
+    for (var i = 0; i &lt; sorted.length; i++) {
+      var it = sorted[i];
+      var dStr = String(it.date || &quot;&quot;).trim();
+      var m = dStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      var dateRu = m ? (m[3] + &quot;.&quot; + m[2] + &quot;.&quot; + m[1]) : dStr;
+      var mins = Math.max(0, Number(it.downtime) || 0);
+      var hh = (&quot;0&quot; + Math.floor(mins / 60)).slice(-2);
+      var mm = (&quot;0&quot; + (mins % 60)).slice(-2);
+      var durHhMm = hh + &quot;:&quot; + mm;
+      var cleanDesc = String(it.desc || &quot;&quot;).replace(/\s*\|\s*Принятые меры:\s*/gi, &quot;. &quot;).replace(/\r?\n+/g, &quot; &quot;).trim();
+      rows.push([
+        sanitizeDateOrTime(dateRu),
+        sanitizeDateOrTime(it.timeStart || &quot;&quot;),
+        sanitizeDateOrTime(it.timeEnd || &quot;&quot;),
+        sanitizeDateOrTime(durHhMm),
+        sanitize(it.equipment || &quot;&quot;),
+        sanitize(it.zone || &quot;&quot;),
+        sanitize(it.tag || &quot;&quot;),
+        sanitize(cleanDesc),
+        sanitize(it.engineer || &quot;&quot;),
+        sanitize(it.status || &quot;Устранено&quot;),
+        sanitize(it.code || &quot;&quot;)
+      ]);
+    }
+    sh.clearContents();
+    sh.getRange(1, 1, rows.length, headers.length).setValues(rows);
+  } catch (err) {}
 }
 
 function getOrCreateSheet(ss, name, headers) {
@@ -3159,24 +3298,24 @@ function readMetaMap(ss) {
   if (!sh || sh.getLastRow() &lt; 1) return map;
   var vals = sh.getDataRange().getValues();
   for (var i = 0; i &lt; vals.length; i++) {
-    var k = String(vals[i][0] || "").trim();
-    if (k &amp;&amp; k !== "Ключ") {
-      map[k] = String(vals[i][1] || "");
+    var k = String(vals[i][0] || &quot;&quot;).trim();
+    if (k &amp;&amp; k !== &quot;Ключ&quot;) {
+      map[k] = String(vals[i][1] || &quot;&quot;);
     }
   }
   return map;
 }
 
 function writeMetaValues(ss, updates) {
-  var headers = ["Ключ", "Значение", "Обновлено"];
+  var headers = [&quot;Ключ&quot;, &quot;Значение&quot;, &quot;Обновлено&quot;];
   var sh = getOrCreateSheet(ss, SHEET_META, headers);
   var vals = sh.getDataRange().getValues();
-  if (vals.length === 0 || String(vals[0][0]) !== "Ключ") {
+  if (vals.length === 0 || String(vals[0][0]) !== &quot;Ключ&quot;) {
     vals = [headers];
   }
   var keyIndex = {};
   for (var i = 1; i &lt; vals.length; i++) {
-    var k = String(vals[i][0] || "").trim();
+    var k = String(vals[i][0] || &quot;&quot;).trim();
     if (k) keyIndex[k] = i;
   }
   var nowIso = new Date().toISOString();
@@ -3196,7 +3335,7 @@ function writeMetaValues(ss, updates) {
 
 function getDeletedLog(metaMap) {
   try {
-    var raw = metaMap["deleted_log"];
+    var raw = metaMap[&quot;deleted_log&quot;];
     if (!raw) return [];
     var arr = JSON.parse(raw);
     return Array.isArray(arr) ? arr : [];
@@ -3207,15 +3346,15 @@ function getDeletedLog(metaMap) {
 
 // Объединение описаний и принятых мер при параллельном редактировании двумя инженерами
 function mergeDescriptions(existingDesc, incomingDesc) {
-  var ex = String(existingDesc || "").trim();
-  var inc = String(incomingDesc || "").trim();
+  var ex = String(existingDesc || &quot;&quot;).trim();
+  var inc = String(incomingDesc || &quot;&quot;).trim();
   if (!ex) return inc;
   if (!inc) return ex;
   if (ex === inc) return inc;
   if (inc.indexOf(ex) !== -1) return inc;
   if (ex.indexOf(inc) !== -1) return ex;
 
-  var sep = " | Принятые меры: ";
+  var sep = &quot; | Принятые меры: &quot;;
   var exParts = ex.split(sep);
   var incParts = inc.split(sep);
   if (exParts.length &gt; 1 || incParts.length &gt; 1) {
@@ -3234,7 +3373,7 @@ function mergeDescriptions(existingDesc, incomingDesc) {
     addM(exParts);
     addM(incParts);
     if (measures.length &gt; 0) {
-      return base + sep + measures.join("; ");
+      return base + sep + measures.join(&quot;; &quot;);
     }
   }
   return inc;
@@ -3260,6 +3399,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
           id: exObj.id || incObj.id,
           code: exObj.code || incObj.code,
           date: exObj.date || incObj.date,
+          dateEnd: exObj.dateEnd || incObj.dateEnd || exObj.date || incObj.date,
           timeStart: exObj.timeStart || incObj.timeStart,
           timeEnd: exObj.timeEnd || incObj.timeEnd,
           downtime: Number(exObj.downtime) || Number(incObj.downtime) || 0,
@@ -3269,7 +3409,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
           desc: mergedDesc,
           engineer: exObj.engineer || incObj.engineer,
           shift: exObj.shift || incObj.shift,
-          level: exObj.level || incObj.level || "1",
+          level: exObj.level || incObj.level || &quot;1&quot;,
           status: exObj.status,
           updatedAt: changed ? nowIso : (exObj.updatedAt || nowIso)
         },
@@ -3286,6 +3426,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
         id: exObj.id || incObj.id,
         code: incObj.code || exObj.code,
         date: incObj.date || exObj.date,
+        dateEnd: incObj.dateEnd || exObj.dateEnd || incObj.date || exObj.date,
         timeStart: incObj.timeStart || exObj.timeStart,
         timeEnd: incObj.timeEnd || exObj.timeEnd,
         downtime: Number(incObj.downtime) || Number(exObj.downtime) || 0,
@@ -3295,7 +3436,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
         desc: mergeDescriptions(exObj.desc, incObj.desc),
         engineer: incObj.engineer || exObj.engineer,
         shift: incObj.shift || exObj.shift,
-        level: incObj.level || exObj.level || "1",
+        level: incObj.level || exObj.level || &quot;1&quot;,
         status: incObj.status,
         updatedAt: (incTs &gt; exTs &amp;&amp; incObj.updatedAt) ? String(incObj.updatedAt) : nowIso
       },
@@ -3319,7 +3460,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
 
   // Входящая запись новее или равна серверной: проверяем, изменилось ли хоть одно содержательное поле
   var finalDesc = mergeDescriptions(exObj.desc, incObj.desc);
-  var finalStatus = incObj.status || exObj.status || "В работе";
+  var finalStatus = incObj.status || exObj.status || &quot;В работе&quot;;
   var finalTimeEnd = incObj.timeEnd !== undefined ? incObj.timeEnd : exObj.timeEnd;
   var finalDowntime = incObj.downtime !== undefined ? (Number(incObj.downtime) || 0) : (Number(exObj.downtime) || 0);
   var finalEq = incObj.equipment || exObj.equipment;
@@ -3327,8 +3468,9 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
   var finalZone = incObj.zone || exObj.zone;
   var finalEng = incObj.engineer || exObj.engineer;
   var finalShift = incObj.shift !== undefined ? incObj.shift : exObj.shift;
-  var finalLevel = String(incObj.level || exObj.level || "1");
+  var finalLevel = String(incObj.level || exObj.level || &quot;1&quot;);
   var finalDate = incObj.date || exObj.date;
+  var finalDateEnd = incObj.dateEnd || exObj.dateEnd || finalDate;
   var finalTimeStart = incObj.timeStart || exObj.timeStart;
   var finalCode = incObj.code || exObj.code;
 
@@ -3341,7 +3483,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
     finalTag !== exObj.tag ||
     finalZone !== exObj.zone ||
     finalEng !== exObj.engineer ||
-    finalLevel !== String(exObj.level || "1") ||
+    finalLevel !== String(exObj.level || &quot;1&quot;) ||
     finalDate !== exObj.date ||
     finalTimeStart !== exObj.timeStart
   );
@@ -3355,6 +3497,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
       id: exObj.id || incObj.id,
       code: finalCode,
       date: finalDate,
+      dateEnd: finalDateEnd,
       timeStart: finalTimeStart,
       timeEnd: finalTimeEnd,
       downtime: finalDowntime,
@@ -3373,26 +3516,40 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
 }
 
 function rowToIncident(row, tz) {
-  var rawId = String(row[0] || "").trim().replace(/^'/, "");
-  var code = String(row[1] || "").trim().replace(/^'/, "");
+  var rawId = String(row[0] || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;);
+  var code = String(row[1] || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;);
   var date = normalizeSheetDate(row[2], tz);
   var timeStart = normalizeSheetTime(row[3], tz);
-  var equipment = String(row[6] || "").trim();
+  var timeEnd = normalizeSheetTime(row[4], tz);
+  var dateEndRaw = row.length &gt; 15 ? normalizeSheetDate(row[15], tz) : &quot;&quot;;
+  var dateEnd = dateEndRaw || (timeEnd ? date : &quot;&quot;);
+  var equipment = String(row[6] || &quot;&quot;).trim();
+  var mins = Math.max(0, Number(row[5]) || 0);
+  var hh = (&quot;0&quot; + Math.floor(mins / 60)).slice(-2);
+  var mm = (&quot;0&quot; + (mins % 60)).slice(-2);
+  var rawDesc = String(row[9] || &quot;&quot;).trim();
+  var cleanDesc = rawDesc.replace(/\s*\|\s*Принятые меры:\s*/gi, &quot;. &quot;).replace(/\r?\n+/g, &quot; &quot;).trim();
+  var mDate = String(date || &quot;&quot;).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  var dateRu = mDate ? (mDate[3] + &quot;.&quot; + mDate[2] + &quot;.&quot; + mDate[1]) : date;
   return {
     id: ensureDeterministicId(rawId, code, date, timeStart, equipment),
     code: code,
     date: date,
+    dateRu: dateRu,
+    dateEnd: dateEnd,
     timeStart: timeStart,
-    timeEnd: normalizeSheetTime(row[4], tz),
-    downtime: Number(row[5]) || 0,
+    timeEnd: timeEnd,
+    downtime: mins,
+    downtimeHhMm: hh + &quot;:&quot; + mm,
     equipment: equipment,
-    tag: String(row[7] || "").trim(),
-    zone: String(row[8] || "").trim(),
-    desc: String(row[9] || "").trim(),
-    engineer: String(row[10] || "").trim(),
-    shift: String(row[11] || "").trim(),
-    level: String(row[12] || "1").trim(),
-    status: String(row[13] || "В работе").trim(),
+    tag: String(row[7] || &quot;&quot;).trim(),
+    zone: String(row[8] || &quot;&quot;).trim(),
+    desc: rawDesc,
+    cleanDesc: cleanDesc,
+    engineer: String(row[10] || &quot;&quot;).trim(),
+    shift: String(row[11] || &quot;&quot;).trim(),
+    level: String(row[12] || &quot;1&quot;).trim(),
+    status: String(row[13] || &quot;В работе&quot;).trim(),
     updatedAt: normalizeSheetIso(row[14], tz)
   };
 }
@@ -3401,64 +3558,65 @@ function incidentToRow(item) {
   var id = ensureDeterministicId(item.id, item.code, item.date, item.timeStart, item.equipment);
   return [
     sanitize(id),
-    sanitize(item.code || ""),
-    sanitizeDateOrTime(item.date || ""),
-    sanitizeDateOrTime(item.timeStart || ""),
-    sanitizeDateOrTime(item.timeEnd || ""),
+    sanitize(item.code || &quot;&quot;),
+    sanitizeDateOrTime(item.date || &quot;&quot;),
+    sanitizeDateOrTime(item.timeStart || &quot;&quot;),
+    sanitizeDateOrTime(item.timeEnd || &quot;&quot;),
     Number(item.downtime) || 0,
-    sanitize(item.equipment || ""),
-    sanitize(item.tag || ""),
-    sanitize(item.zone || ""),
-    sanitize(item.desc || ""),
-    sanitize(item.engineer || ""),
-    sanitize(item.shift || ""),
-    sanitize(item.level || "1"),
-    sanitize(item.status || "В работе"),
-    sanitize(item.updatedAt || new Date().toISOString())
+    sanitize(item.equipment || &quot;&quot;),
+    sanitize(item.tag || &quot;&quot;),
+    sanitize(item.zone || &quot;&quot;),
+    sanitize(item.desc || &quot;&quot;),
+    sanitize(item.engineer || &quot;&quot;),
+    sanitize(item.shift || &quot;&quot;),
+    sanitize(item.level || &quot;1&quot;),
+    sanitize(item.status || &quot;В работе&quot;),
+    sanitize(item.updatedAt || new Date().toISOString()),
+    sanitizeDateOrTime(item.dateEnd || (item.timeEnd ? item.date : &quot;&quot;))
   ];
 }
 
 // Ключ дедупликации по бизнес-полям (если у одной записи на разных устройствах оказались разные ID, но одинаковый код+дата+узел)
 function getIncidentNaturalKey(rec) {
-  if (!rec || !rec.code) return "";
-  return [String(rec.code).trim(), String(rec.date || "").trim(), String(rec.equipment || "").trim()].join("|").toLowerCase();
+  if (!rec || !rec.code) return &quot;&quot;;
+  return [String(rec.code).trim(), String(rec.date || &quot;&quot;).trim(), String(rec.equipment || &quot;&quot;).trim()].join(&quot;|&quot;).toLowerCase();
 }
 
 function rowToShiftMsg(row, tz) {
   return {
-    id: String(row[0] || "").trim().replace(/^'/, ""),
-    type: String(row[1] || "handover").trim(),
-    text: String(row[2] || "").trim(),
-    author: String(row[3] || "").trim(),
-    shift: String(row[4] || "day").trim(),
+    id: String(row[0] || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;),
+    type: String(row[1] || &quot;handover&quot;).trim(),
+    text: String(row[2] || &quot;&quot;).trim(),
+    author: String(row[3] || &quot;&quot;).trim(),
+    shift: String(row[4] || &quot;day&quot;).trim(),
     date: normalizeSheetDate(row[5], tz),
     time: normalizeSheetTime(row[6], tz),
-    target: String(row[7] || "all").trim(),
-    equipment: String(row[8] || "").trim(),
-    zone: String(row[9] || "").trim(),
-    isDone: Boolean(row[10] === true || String(row[10]).toLowerCase() === "true" || row[10] === 1),
-    doneBy: String(row[11] || "").trim(),
-    doneAt: String(row[12] || "").trim().replace(/^'/, ""),
-    pinned: Boolean(row[13] === true || String(row[13]).toLowerCase() === "true" || row[13] === 1),
+    target: String(row[7] || &quot;all&quot;).trim(),
+    equipment: String(row[8] || &quot;&quot;).trim(),
+    zone: String(row[9] || &quot;&quot;).trim(),
+    isDone: Boolean(row[10] === true || String(row[10]).toLowerCase() === &quot;true&quot; || row[10] === 1),
+    doneBy: String(row[11] || &quot;&quot;).trim(),
+    doneAt: String(row[12] || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;),
+    pinned: Boolean(row[13] === true || String(row[13]).toLowerCase() === &quot;true&quot; || row[13] === 1),
     updatedAt: normalizeSheetIso(row[14], tz)
   };
 }
 
 function shiftMsgToRow(msg) {
   return [
-    sanitize(msg.id || ""),
-    sanitize(msg.type || "handover"),
-    sanitize(msg.text || ""),
-    sanitize(msg.author || ""),
-    sanitize(msg.shift || "day"),
-    sanitizeDateOrTime(msg.date || ""),
-    sanitizeDateOrTime(msg.time || ""),
-    sanitize(msg.target || "all"),
-    sanitize(msg.equipment || ""),
-    sanitize(msg.zone || ""),
+    sanitize(msg.id || &quot;&quot;),
+    sanitize(msg.type || &quot;handover&quot;),
+    sanitize(msg.text || &quot;&quot;),
+    sanitize(msg.author || &quot;&quot;),
+    sanitize(msg.shift || &quot;day&quot;),
+    sanitizeDateOrTime(msg.date || &quot;&quot;),
+    sanitizeDateOrTime(msg.time || &quot;&quot;),
+    sanitize(msg.target || &quot;all&quot;),
+    sanitize(msg.equipment || &quot;&quot;),
+    sanitize(msg.zone || &quot;&quot;),
     Boolean(msg.isDone),
-    sanitize(msg.doneBy || ""),
-    sanitizeDateOrTime(msg.doneAt || ""),
+    sanitize(msg.doneBy || &quot;&quot;),
+    sanitizeDateOrTime(msg.doneAt || &quot;&quot;),
     Boolean(msg.pinned),
     sanitize(msg.updatedAt || new Date().toISOString())
   ];
@@ -3466,23 +3624,23 @@ function shiftMsgToRow(msg) {
 
 function rowToNote(row, tz) {
   return {
-    id: String(row[0] || "").trim().replace(/^'/, ""),
-    category: "custom",
-    title: String(row[1] || "").trim(),
-    equipment: String(row[2] || "all").trim(),
-    content: String(row[3] || "").trim(),
-    author: String(row[4] || "").trim(),
+    id: String(row[0] || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;),
+    category: &quot;custom&quot;,
+    title: String(row[1] || &quot;&quot;).trim(),
+    equipment: String(row[2] || &quot;all&quot;).trim(),
+    content: String(row[3] || &quot;&quot;).trim(),
+    author: String(row[4] || &quot;&quot;).trim(),
     updatedAt: normalizeSheetIso(row[5], tz)
   };
 }
 
 function noteToRow(note) {
   return [
-    sanitize(note.id || ""),
-    sanitize(note.title || ""),
-    sanitize(note.equipment || "all"),
-    sanitize(note.content || ""),
-    sanitize(note.author || ""),
+    sanitize(note.id || &quot;&quot;),
+    sanitize(note.title || &quot;&quot;),
+    sanitize(note.equipment || &quot;all&quot;),
+    sanitize(note.content || &quot;&quot;),
+    sanitize(note.author || &quot;&quot;),
     sanitize(note.updatedAt || new Date().toISOString())
   ];
 }
@@ -3494,90 +3652,90 @@ function readDatabasesFromSheets(ss) {
     var vals = sh.getDataRange().getValues();
     var list = [];
     for (var i = 1; i &lt; vals.length; i++) {
-      var v = String(vals[i][0] || "").trim();
+      var v = String(vals[i][0] || &quot;&quot;).trim();
       if (v) list.push(v);
     }
     return list;
   };
 
-  var zones = getColValues("Справочник_Зоны");
-  var engineers = getColValues("Справочник_Инженеры");
+  var zones = getColValues(&quot;Справочник_Зоны&quot;);
+  var engineers = getColValues(&quot;Справочник_Инженеры&quot;);
 
   var equipment = [];
-  var shEq = ss.getSheetByName("Справочник_Оборудование");
+  var shEq = ss.getSheetByName(&quot;Справочник_Оборудование&quot;);
   if (shEq &amp;&amp; shEq.getLastRow() &gt; 1) {
     var vals = shEq.getDataRange().getValues();
     for (var i = 1; i &lt; vals.length; i++) {
-      var name = String(vals[i][0] || "").trim();
-      var zoneStr = String(vals[i][1] || "all").trim();
-      var zList = zoneStr === "all" ? ["all"] : zoneStr.split(",").map(function(s) { return s.trim(); }).filter(Boolean);
-      if (name) equipment.push({ name: name, zones: zList.length &gt; 0 ? zList : ["all"] });
+      var name = String(vals[i][0] || &quot;&quot;).trim();
+      var zoneStr = String(vals[i][1] || &quot;all&quot;).trim();
+      var zList = zoneStr === &quot;all&quot; ? [&quot;all&quot;] : zoneStr.split(&quot;,&quot;).map(function(s) { return s.trim(); }).filter(Boolean);
+      if (name) equipment.push({ name: name, zones: zList.length &gt; 0 ? zList : [&quot;all&quot;] });
     }
   }
 
   var quickTags = [];
-  var shTags = ss.getSheetByName("Справочник_Шаблоны");
+  var shTags = ss.getSheetByName(&quot;Справочник_Шаблоны&quot;);
   if (shTags &amp;&amp; shTags.getLastRow() &gt; 1) {
     var vals = shTags.getDataRange().getValues();
     for (var i = 1; i &lt; vals.length; i++) {
-      var text = String(vals[i][0] || "").trim();
-      var eqStr = String(vals[i][1] || "all").trim();
-      var eqList = eqStr === "all" ? ["all"] : eqStr.split(",").map(function(s) { return s.trim(); }).filter(Boolean);
-      if (text) quickTags.push({ text: text, equipments: eqList.length &gt; 0 ? eqList : ["all"] });
+      var text = String(vals[i][0] || &quot;&quot;).trim();
+      var eqStr = String(vals[i][1] || &quot;all&quot;).trim();
+      var eqList = eqStr === &quot;all&quot; ? [&quot;all&quot;] : eqStr.split(&quot;,&quot;).map(function(s) { return s.trim(); }).filter(Boolean);
+      if (text) quickTags.push({ text: text, equipments: eqList.length &gt; 0 ? eqList : [&quot;all&quot;] });
     }
   }
 
   var checklists = [];
-  var shCh = ss.getSheetByName("Справочник_Чеклисты");
+  var shCh = ss.getSheetByName(&quot;Справочник_Чеклисты&quot;);
   if (shCh &amp;&amp; shCh.getLastRow() &gt; 1) {
     var vals = shCh.getDataRange().getValues();
     for (var i = 1; i &lt; vals.length; i++) {
-      var id = String(vals[i][0] || "").trim();
-      var title = String(vals[i][1] || "").trim();
-      var desc = String(vals[i][2] || "").trim();
-      var grp = String(vals[i][3] || "Регламентный сменный обход (Приём смены)").trim();
-      if (title) checklists.push({ id: id || ("c-" + i), title: title, desc: desc, group: grp || "Регламентный сменный обход (Приём смены)" });
+      var id = String(vals[i][0] || &quot;&quot;).trim();
+      var title = String(vals[i][1] || &quot;&quot;).trim();
+      var desc = String(vals[i][2] || &quot;&quot;).trim();
+      var grp = String(vals[i][3] || &quot;Регламентный сменный обход (Приём смены)&quot;).trim();
+      if (title) checklists.push({ id: id || (&quot;c-&quot; + i), title: title, desc: desc, group: grp || &quot;Регламентный сменный обход (Приём смены)&quot; });
     }
   }
 
   var levels = [];
   var levelsEnabled = false;
-  var shLvl = ss.getSheetByName("Справочник_Уровни");
+  var shLvl = ss.getSheetByName(&quot;Справочник_Уровни&quot;);
   if (shLvl &amp;&amp; shLvl.getLastRow() &gt; 1) {
     var lVals = shLvl.getDataRange().getValues();
     for (var i = 1; i &lt; lVals.length; i++) {
-      var lid = String(lVals[i][0] || "").trim();
-      var lshort = String(lVals[i][1] || "").trim();
-      var ltitle = String(lVals[i][2] || "").trim();
+      var lid = String(lVals[i][0] || &quot;&quot;).trim();
+      var lshort = String(lVals[i][1] || &quot;&quot;).trim();
+      var ltitle = String(lVals[i][2] || &quot;&quot;).trim();
       var lbars = Number(lVals[i][3]) || 1;
-      if (i === 1 &amp;&amp; String(lVals[i][4] || "").toLowerCase() === "true") levelsEnabled = true;
+      if (i === 1 &amp;&amp; String(lVals[i][4] || &quot;&quot;).toLowerCase() === &quot;true&quot;) levelsEnabled = true;
       if (lshort) levels.push({ id: lid || String(i), short: lshort, title: ltitle || lshort, bars: lbars });
     }
   }
 
   var kbCategories = [];
-  var shKbCats = ss.getSheetByName("Справочник_РазделыБЗ");
+  var shKbCats = ss.getSheetByName(&quot;Справочник_РазделыБЗ&quot;);
   if (shKbCats &amp;&amp; shKbCats.getLastRow() &gt; 1) {
     var vals = shKbCats.getDataRange().getValues();
     for (var i = 1; i &lt; vals.length; i++) {
-      var id = String(vals[i][0] || "").trim();
-      var label = String(vals[i][1] || "").trim();
-      var icon = String(vals[i][2] || "note").trim();
+      var id = String(vals[i][0] || &quot;&quot;).trim();
+      var label = String(vals[i][1] || &quot;&quot;).trim();
+      var icon = String(vals[i][2] || &quot;note&quot;).trim();
       if (id &amp;&amp; label) kbCategories.push({ id: id, label: label, icon: icon });
     }
   }
 
   var kbArticles = [];
-  var shKb = ss.getSheetByName("Справочник_БазаЗнаний");
+  var shKb = ss.getSheetByName(&quot;Справочник_БазаЗнаний&quot;);
   if (shKb &amp;&amp; shKb.getLastRow() &gt; 1) {
     var vals = shKb.getDataRange().getValues();
     for (var i = 1; i &lt; vals.length; i++) {
-      var id = String(vals[i][0] || "").trim();
-      var category = String(vals[i][1] || "custom").trim();
-      var title = String(vals[i][2] || "").trim();
-      var content = String(vals[i][3] || "").trim();
-      var eqBinding = String(vals[i][4] || "all").trim();
-      if (title) kbArticles.push({ id: id || ("kb-" + i), category: category, title: title, content: content, equipment: eqBinding });
+      var id = String(vals[i][0] || &quot;&quot;).trim();
+      var category = String(vals[i][1] || &quot;custom&quot;).trim();
+      var title = String(vals[i][2] || &quot;&quot;).trim();
+      var content = String(vals[i][3] || &quot;&quot;).trim();
+      var eqBinding = String(vals[i][4] || &quot;all&quot;).trim();
+      if (title) kbArticles.push({ id: id || (&quot;kb-&quot; + i), category: category, title: title, content: content, equipment: eqBinding });
     }
   }
 
@@ -3601,11 +3759,11 @@ function filterDeltaPayload(allIncidents, allShift, allNotes, deletedLog, opts, 
   var fullSync = Boolean(opts.full_sync);
   var touchedIds = opts.touchedIds || {};
 
-  var cutoffDateStr = "";
+  var cutoffDateStr = &quot;&quot;;
   var cutoffMs = 0;
   if (!fullSync &amp;&amp; syncDays &gt; 0) {
     var cutoffDate = new Date(Date.now() - syncDays * 86400000);
-    cutoffDateStr = Utilities.formatDate(cutoffDate, tz || DEFAULT_TZ, "yyyy-MM-dd");
+    cutoffDateStr = Utilities.formatDate(cutoffDate, tz || DEFAULT_TZ, &quot;yyyy-MM-dd&quot;);
     cutoffMs = cutoffDate.getTime();
   }
 
@@ -3613,7 +3771,7 @@ function filterDeltaPayload(allIncidents, allShift, allNotes, deletedLog, opts, 
   for (var i = 0; i &lt; allIncidents.length; i++) {
     var inc = allIncidents[i];
     var key = inc.id || inc.code;
-    var isUnresolved = (inc.status !== "Устранено");
+    var isUnresolved = (inc.status !== &quot;Устранено&quot;);
     var uTs = parseTs(inc.updatedAt);
 
     if (fullSync) {
@@ -3648,7 +3806,7 @@ function filterDeltaPayload(allIncidents, allShift, allNotes, deletedLog, opts, 
   for (var j = 0; j &lt; allShift.length; j++) {
     var sm = allShift[j];
     var smTs = parseTs(sm.updatedAt);
-    var isActiveTask = (sm.type === "leader_task" &amp;&amp; !sm.isDone) || sm.pinned;
+    var isActiveTask = (sm.type === &quot;leader_task&quot; &amp;&amp; !sm.isDone) || sm.pinned;
     if (fullSync || sinceTs === 0) {
       if (!fullSync &amp;&amp; cutoffDateStr &amp;&amp; sm.date &amp;&amp; sm.date &lt; cutoffDateStr &amp;&amp; !isActiveTask &amp;&amp; smTs &lt; cutoffMs) {
         continue;
@@ -3690,22 +3848,22 @@ function doGet(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var tz = getSpreadsheetTz(ss);
     var params = (e &amp;&amp; e.parameter) ? e.parameter : {};
-    var action = params.action || "get_all";
+    var action = params.action || &quot;get_all&quot;;
     var clientDbVer = Number(params.client_db_version || 0);
     var sinceTs = Number(params.since_ts || 0);
     var syncDays = params.sync_days !== undefined ? Number(params.sync_days) : 0;
-    var fullSync = (params.full_sync === "true" || params.full_sync === "1" || action === "get_all");
+    var fullSync = (params.full_sync === &quot;true&quot; || params.full_sync === &quot;1&quot; || action === &quot;get_all&quot;);
 
     var metaMap = readMetaMap(ss);
-    var cloudDbVer = Number(metaMap["db_version"] || 0);
-    var journalRev = Number(metaMap["journal_rev"] || 0);
+    var cloudDbVer = Number(metaMap[&quot;db_version&quot;] || 0);
+    var journalRev = Number(metaMap[&quot;journal_rev&quot;] || 0);
     var deletedLog = getDeletedLog(metaMap);
     var serverTs = Date.now();
     var nowIso = new Date(serverTs).toISOString();
 
-    if (action === "get_databases") {
+    if (action === &quot;get_databases&quot;) {
       return ContentService.createTextOutput(JSON.stringify({
-        status: "ok",
+        status: &quot;ok&quot;,
         server_ts: serverTs,
         db_version: cloudDbVer,
         databases: readDatabasesFromSheets(ss)
@@ -3716,7 +3874,7 @@ function doGet(e) {
     var incidents = [];
     var incById = {};
     var incByNatKey = {};
-    var shJ = ss.getSheetByName(SHEET_JOURNAL) || ss.getSheetByName("Лист1") || ss.getSheets()[0];
+    var shJ = ss.getSheetByName(SHEET_JOURNAL) || ss.getSheetByName(&quot;Лист1&quot;) || ss.getSheets()[0];
     if (shJ &amp;&amp; shJ.getLastRow() &gt; 1) {
       var data = shJ.getDataRange().getValues();
       for (var i = 1; i &lt; data.length; i++) {
@@ -3769,7 +3927,7 @@ function doGet(e) {
     }, tz);
 
     var response = {
-      status: "ok",
+      status: &quot;ok&quot;,
       server_ts: serverTs,
       journal_rev: journalRev || serverTs,
       is_delta: (sinceTs &gt; 0 &amp;&amp; !fullSync),
@@ -3782,14 +3940,14 @@ function doGet(e) {
       has_db_update: (cloudDbVer &gt; clientDbVer)
     };
 
-    if (cloudDbVer &gt; clientDbVer || action === "get_all") {
+    if (cloudDbVer &gt; clientDbVer || action === &quot;get_all&quot;) {
       response.databases = readDatabasesFromSheets(ss);
     }
 
     return ContentService.createTextOutput(JSON.stringify(response))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+    return ContentService.createTextOutput(JSON.stringify({ status: &quot;error&quot;, message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
@@ -3814,12 +3972,12 @@ function doPost(e) {
         payload = {};
       }
     }
-    var action = payload.action || "sync_journal_and_notes";
+    var action = payload.action || &quot;sync_journal_and_notes&quot;;
     var nowMs = Date.now();
     var nowIso = new Date(nowMs).toISOString();
 
     // А) СИНХРОНИЗАЦИЯ СПРАВОЧНИКОВ ROOT (sync_databases)
-    if (action === "sync_databases") {
+    if (action === &quot;sync_databases&quot;) {
       var dbs = payload.databases || {};
       var newVer = payload.db_version || nowMs;
 
@@ -3835,42 +3993,42 @@ function doPost(e) {
 
       if (dbs.zones &amp;&amp; Array.isArray(dbs.zones)) {
         var rows = dbs.zones.map(function(z) { return [sanitize(z)]; }).filter(function(r) { return r[0]; });
-        batchWriteSheet("Справочник_Зоны", ["Название зоны"], rows);
+        batchWriteSheet(&quot;Справочник_Зоны&quot;, [&quot;Название зоны&quot;], rows);
       }
 
       if (dbs.engineers &amp;&amp; Array.isArray(dbs.engineers)) {
         var rows = dbs.engineers.map(function(eng) { return [sanitize(eng)]; }).filter(function(r) { return r[0]; });
-        batchWriteSheet("Справочник_Инженеры", ["Ф.И.О. инженера"], rows);
+        batchWriteSheet(&quot;Справочник_Инженеры&quot;, [&quot;Ф.И.О. инженера&quot;], rows);
       }
 
       if (dbs.equipment &amp;&amp; Array.isArray(dbs.equipment)) {
         var rows = dbs.equipment.map(function(eq) {
-          var name = typeof eq === "object" ? (eq.name || "") : String(eq);
-          var zones = typeof eq === "object" ? (Array.isArray(eq.zones) ? eq.zones.join(", ") : (eq.zone || "all")) : "all";
+          var name = typeof eq === &quot;object&quot; ? (eq.name || &quot;&quot;) : String(eq);
+          var zones = typeof eq === &quot;object&quot; ? (Array.isArray(eq.zones) ? eq.zones.join(&quot;, &quot;) : (eq.zone || &quot;all&quot;)) : &quot;all&quot;;
           return [sanitize(name), sanitize(zones)];
         }).filter(function(r) { return r[0]; });
-        batchWriteSheet("Справочник_Оборудование", ["Наименование оборудования / узла", "Привязка к зонам (через запятую)"], rows);
+        batchWriteSheet(&quot;Справочник_Оборудование&quot;, [&quot;Наименование оборудования / узла&quot;, &quot;Привязка к зонам (через запятую)&quot;], rows);
       }
 
       if (dbs.quickTags &amp;&amp; Array.isArray(dbs.quickTags)) {
         var rows = dbs.quickTags.map(function(tag) {
-          var text = typeof tag === "object" ? (tag.text || "") : String(tag);
-          var eqs = typeof tag === "object" ? (Array.isArray(tag.equipments) ? tag.equipments.join(", ") : (tag.equipment || "all")) : "all";
+          var text = typeof tag === &quot;object&quot; ? (tag.text || &quot;&quot;) : String(tag);
+          var eqs = typeof tag === &quot;object&quot; ? (Array.isArray(tag.equipments) ? tag.equipments.join(&quot;, &quot;) : (tag.equipment || &quot;all&quot;)) : &quot;all&quot;;
           return [sanitize(text), sanitize(eqs)];
         }).filter(function(r) { return r[0]; });
-        batchWriteSheet("Справочник_Шаблоны", ["Шаблон решения / Быстрая фраза", "Привязка к оборудованию / узлу"], rows);
+        batchWriteSheet(&quot;Справочник_Шаблоны&quot;, [&quot;Шаблон решения / Быстрая фраза&quot;, &quot;Привязка к оборудованию / узлу&quot;], rows);
       }
 
       if (dbs.checklists &amp;&amp; Array.isArray(dbs.checklists)) {
         var rows = dbs.checklists.map(function(ch) {
           return [
-            sanitize(ch.id || ""),
-            sanitize(ch.title || ""),
-            sanitize(ch.desc || ""),
-            sanitize(ch.group || "Регламентный сменный обход (Приём смены)")
+            sanitize(ch.id || &quot;&quot;),
+            sanitize(ch.title || &quot;&quot;),
+            sanitize(ch.desc || &quot;&quot;),
+            sanitize(ch.group || &quot;Регламентный сменный обход (Приём смены)&quot;)
           ];
         });
-        batchWriteSheet("Справочник_Чеклисты", ["ID", "Заголовок проверки", "Описание / регламент", "Название чек-листа"], rows);
+        batchWriteSheet(&quot;Справочник_Чеклисты&quot;, [&quot;ID&quot;, &quot;Заголовок проверки&quot;, &quot;Описание / регламент&quot;, &quot;Название чек-листа&quot;], rows);
       }
 
       if (dbs.levels &amp;&amp; Array.isArray(dbs.levels)) {
@@ -3878,49 +4036,49 @@ function doPost(e) {
         var rows = dbs.levels.map(function(lv, idx) {
           return [
             sanitize(lv.id || String(idx + 1)),
-            sanitize(lv.short || ""),
-            sanitize(lv.title || lv.short || ""),
+            sanitize(lv.short || &quot;&quot;),
+            sanitize(lv.title || lv.short || &quot;&quot;),
             Number(lv.bars) || 1,
-            idx === 0 ? (lEn ? "true" : "false") : ""
+            idx === 0 ? (lEn ? &quot;true&quot; : &quot;false&quot;) : &quot;&quot;
           ];
         });
-        batchWriteSheet("Справочник_Уровни", ["ID", "Краткое название", "Полное описание", "Полосок (1-3)", "Функция включена"], rows);
+        batchWriteSheet(&quot;Справочник_Уровни&quot;, [&quot;ID&quot;, &quot;Краткое название&quot;, &quot;Полное описание&quot;, &quot;Полосок (1-3)&quot;, &quot;Функция включена&quot;], rows);
       }
 
       if (dbs.kbCategories &amp;&amp; Array.isArray(dbs.kbCategories)) {
         var rows = dbs.kbCategories.map(function(cat) {
-          return [sanitize(cat.id || ""), sanitize(cat.label || ""), sanitize(cat.icon || "note")];
+          return [sanitize(cat.id || &quot;&quot;), sanitize(cat.label || &quot;&quot;), sanitize(cat.icon || &quot;note&quot;)];
         });
-        batchWriteSheet("Справочник_РазделыБЗ", ["ID раздела", "Название раздела", "Иконка"], rows);
+        batchWriteSheet(&quot;Справочник_РазделыБЗ&quot;, [&quot;ID раздела&quot;, &quot;Название раздела&quot;, &quot;Иконка&quot;], rows);
       }
 
       if (dbs.kbArticles &amp;&amp; Array.isArray(dbs.kbArticles)) {
         var rows = dbs.kbArticles.map(function(kb) {
           return [
-            sanitize(kb.id || ""),
-            sanitize(kb.category || "custom"),
-            sanitize(kb.title || ""),
-            sanitize(kb.content || ""),
-            sanitize(kb.equipment || "all")
+            sanitize(kb.id || &quot;&quot;),
+            sanitize(kb.category || &quot;custom&quot;),
+            sanitize(kb.title || &quot;&quot;),
+            sanitize(kb.content || &quot;&quot;),
+            sanitize(kb.equipment || &quot;all&quot;)
           ];
         });
-        batchWriteSheet("Справочник_БазаЗнаний", ["ID", "Категория", "Заголовок статьи", "Содержание (HTML)", "Привязка к оборудованию"], rows);
+        batchWriteSheet(&quot;Справочник_БазаЗнаний&quot;, [&quot;ID&quot;, &quot;Категория&quot;, &quot;Заголовок статьи&quot;, &quot;Содержание (HTML)&quot;, &quot;Привязка к оборудованию&quot;], rows);
       }
 
       writeMetaValues(ss, {
         db_version: String(newVer),
-        db_author: "root"
+        db_author: &quot;root&quot;
       });
 
-      return ContentService.createTextOutput(JSON.stringify({ status: "ok", db_version: newVer, server_ts: nowMs }))
+      return ContentService.createTextOutput(JSON.stringify({ status: &quot;ok&quot;, db_version: newVer, server_ts: nowMs }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
     // Б) АТОМАРНАЯ ДЕЛЬТА-СИНХРОНИЗАЦИЯ И ОБРАТНАЯ СОВМЕСТИМОСТЬ (delta_sync / sync_journal_and_notes / sync_incidents)
-    if (action === "delta_sync" || action === "sync_journal_and_notes" || action === "sync_incidents") {
+    if (action === &quot;delta_sync&quot; || action === &quot;sync_journal_and_notes&quot; || action === &quot;sync_incidents&quot;) {
       var metaMap = readMetaMap(ss);
-      var cloudDbVer = Number(metaMap["db_version"] || 0);
-      var journalRev = Number(metaMap["journal_rev"] || 0);
+      var cloudDbVer = Number(metaMap[&quot;db_version&quot;] || 0);
+      var journalRev = Number(metaMap[&quot;journal_rev&quot;] || 0);
       var deletedLog = getDeletedLog(metaMap);
       var deletedMap = {};
       for (var d = 0; d &lt; deletedLog.length; d++) {
@@ -3939,9 +4097,9 @@ function doPost(e) {
           deletedMap[dKey] = delTs;
           if (delEntry.code) deletedMap[String(delEntry.code).trim()] = delTs;
           deletedLog.push({
-            id: String(delEntry.id || ""),
-            code: String(delEntry.code || ""),
-            type: String(delEntry.type || "incident"),
+            id: String(delEntry.id || &quot;&quot;),
+            code: String(delEntry.code || &quot;&quot;),
+            type: String(delEntry.type || &quot;incident&quot;),
             ts: delTs
           });
           deletedChanged = true;
@@ -3956,9 +4114,9 @@ function doPost(e) {
 
       // --- 1. ОБРАБОТКА ЖУРНАЛА ИНЦИДЕНТОВ ---
       var journalHeaders = [
-        "ID", "Код инцидента", "Дата", "Время начала", "Время устранения",
-        "Простой (мин)", "Оборудование", "Тег/Узел", "Зона", "Описание / Меры",
-        "Инженер", "Смена", "Уровень", "Статус", "Дата обновления"
+        &quot;ID&quot;, &quot;Код инцидента&quot;, &quot;Дата&quot;, &quot;Время начала&quot;, &quot;Время устранения&quot;,
+        &quot;Простой (мин)&quot;, &quot;Оборудование&quot;, &quot;Тег/Узел&quot;, &quot;Зона&quot;, &quot;Описание / Меры&quot;,
+        &quot;Инженер&quot;, &quot;Смена&quot;, &quot;Уровень&quot;, &quot;Статус&quot;, &quot;Дата обновления&quot;, &quot;Дата устранения&quot;
       ];
       var shJ = getOrCreateSheet(ss, SHEET_JOURNAL, journalHeaders);
       var jRaw = shJ.getDataRange().getValues();
@@ -3972,7 +4130,7 @@ function doPost(e) {
       for (var i = 1; i &lt; jRaw.length; i++) {
         var r = jRaw[i];
         if (!r[0] &amp;&amp; !r[1] &amp;&amp; !r[6]) continue;
-        var rawIdInSheet = String(r[0] || "").trim().replace(/^'/, "");
+        var rawIdInSheet = String(r[0] || &quot;&quot;).trim().replace(/^&#x27;/, &quot;&quot;);
         var rec = rowToIncident(r, tz);
         if (!rawIdInSheet &amp;&amp; rec.id) {
           jSheetModified = true; // Запишем сгенерированный стабильный ID в столбец A
@@ -4007,8 +4165,8 @@ function doPost(e) {
         if (!item) continue;
         var normDate = normalizeSheetDate(item.date, tz);
         var normStart = normalizeSheetTime(item.timeStart, tz);
-        var normEq = String(item.equipment || "").trim();
-        var itemCode = String(item.code || "").trim();
+        var normEq = String(item.equipment || &quot;&quot;).trim();
+        var itemCode = String(item.code || &quot;&quot;).trim();
         var itemId = ensureDeterministicId(item.id, itemCode, normDate, normStart, normEq);
 
         var delTs = (itemId &amp;&amp; deletedMap[itemId]) || (itemCode &amp;&amp; deletedMap[itemCode]) || 0;
@@ -4024,17 +4182,18 @@ function doPost(e) {
           id: itemId,
           code: itemCode,
           date: normDate,
+          dateEnd: normalizeSheetDate(item.dateEnd, tz) || (item.timeEnd ? normDate : &quot;&quot;),
           timeStart: normStart,
           timeEnd: normalizeSheetTime(item.timeEnd, tz),
           downtime: Number(item.downtime) || 0,
           equipment: normEq,
-          tag: String(item.tag || "").trim(),
-          zone: String(item.zone || "").trim(),
-          desc: String(item.desc || "").trim(),
-          engineer: String(item.engineer || "").trim(),
-          shift: String(item.shift || "").trim(),
-          level: String(item.level || "1").trim(),
-          status: String(item.status || "В работе").trim(),
+          tag: String(item.tag || &quot;&quot;).trim(),
+          zone: String(item.zone || &quot;&quot;).trim(),
+          desc: String(item.desc || &quot;&quot;).trim(),
+          engineer: String(item.engineer || &quot;&quot;).trim(),
+          shift: String(item.shift || &quot;&quot;).trim(),
+          level: String(item.level || &quot;1&quot;).trim(),
+          status: String(item.status || &quot;В работе&quot;).trim(),
           updatedAt: item.updatedAt ? String(item.updatedAt) : nowIso,
           explicitReopen: Boolean(item.explicitReopen)
         };
@@ -4064,6 +4223,7 @@ function doPost(e) {
           outJ.push(incidentToRow(jRecords[jr]));
         }
         shJ.getRange(1, 1, outJ.length, journalHeaders.length).setValues(outJ);
+        rebuildExcelExportSheet(ss, jRecords);
         if (oldJRowCount &gt; outJ.length) {
           shJ.getRange(outJ.length + 1, 1, oldJRowCount - outJ.length, journalHeaders.length).clearContent();
         }
@@ -4072,9 +4232,9 @@ function doPost(e) {
 
       // --- 2. ОБРАБОТКА СМЕННЫХ СООБЩЕНИЙ И ЗАДАЧ ---
       var shiftHeaders = [
-        "ID", "Тип", "Текст сообщения", "Автор", "Смена", "Дата", "Время",
-        "Кому адресовано", "Оборудование", "Зона", "Выполнено", "Кто выполнил",
-        "Когда выполнено", "Закреплено", "Дата обновления"
+        &quot;ID&quot;, &quot;Тип&quot;, &quot;Текст сообщения&quot;, &quot;Автор&quot;, &quot;Смена&quot;, &quot;Дата&quot;, &quot;Время&quot;,
+        &quot;Кому адресовано&quot;, &quot;Оборудование&quot;, &quot;Зона&quot;, &quot;Выполнено&quot;, &quot;Кто выполнил&quot;,
+        &quot;Когда выполнено&quot;, &quot;Закреплено&quot;, &quot;Дата обновления&quot;
       ];
       var shS = getOrCreateSheet(ss, SHEET_SHIFT, shiftHeaders);
       var sRaw = shS.getDataRange().getValues();
@@ -4111,18 +4271,18 @@ function doPost(e) {
 
         var normMsg = {
           id: mId,
-          type: String(msg.type || "handover").trim(),
-          text: String(msg.text || "").trim(),
-          author: String(msg.author || "").trim(),
-          shift: String(msg.shift || "day").trim(),
+          type: String(msg.type || &quot;handover&quot;).trim(),
+          text: String(msg.text || &quot;&quot;).trim(),
+          author: String(msg.author || &quot;&quot;).trim(),
+          shift: String(msg.shift || &quot;day&quot;).trim(),
           date: normalizeSheetDate(msg.date, tz),
           time: normalizeSheetTime(msg.time, tz),
-          target: String(msg.target || "all").trim(),
-          equipment: String(msg.equipment || "").trim(),
-          zone: String(msg.zone || "").trim(),
+          target: String(msg.target || &quot;all&quot;).trim(),
+          equipment: String(msg.equipment || &quot;&quot;).trim(),
+          zone: String(msg.zone || &quot;&quot;).trim(),
           isDone: Boolean(msg.isDone),
-          doneBy: String(msg.doneBy || "").trim(),
-          doneAt: String(msg.doneAt || "").trim(),
+          doneBy: String(msg.doneBy || &quot;&quot;).trim(),
+          doneAt: String(msg.doneAt || &quot;&quot;).trim(),
           pinned: Boolean(msg.pinned),
           updatedAt: msg.updatedAt ? String(msg.updatedAt) : nowIso
         };
@@ -4169,8 +4329,8 @@ function doPost(e) {
 
       // --- 3. ОБРАБОТКА ПРАКТИЧЕСКИХ РЕШЕНИЙ (Заметок) ---
       var notesHeaders = [
-        "ID", "Заголовок решения", "Оборудование / Узел", "Содержание (HTML)",
-        "Автор / Инженер", "Дата обновления"
+        &quot;ID&quot;, &quot;Заголовок решения&quot;, &quot;Оборудование / Узел&quot;, &quot;Содержание (HTML)&quot;,
+        &quot;Автор / Инженер&quot;, &quot;Дата обновления&quot;
       ];
       var shN = getOrCreateSheet(ss, SHEET_NOTES, notesHeaders);
       var nRaw = shN.getDataRange().getValues();
@@ -4207,11 +4367,11 @@ function doPost(e) {
 
         var normNote = {
           id: nId,
-          category: "custom",
-          title: String(note.title || "").trim(),
-          equipment: String(note.equipment || "all").trim(),
-          content: String(note.content || "").trim(),
-          author: String(note.author || "").trim(),
+          category: &quot;custom&quot;,
+          title: String(note.title || &quot;&quot;).trim(),
+          equipment: String(note.equipment || &quot;all&quot;).trim(),
+          content: String(note.content || &quot;&quot;).trim(),
+          author: String(note.author || &quot;&quot;).trim(),
           updatedAt: note.updatedAt ? String(note.updatedAt) : nowIso
         };
 
@@ -4268,7 +4428,7 @@ function doPost(e) {
       }, tz);
 
       var responseObj = {
-        status: "ok",
+        status: &quot;ok&quot;,
         server_ts: nowMs,
         journal_rev: journalRev || nowMs,
         is_delta: (sinceTs &gt; 0 &amp;&amp; !fullSync),
@@ -4292,10 +4452,10 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    return ContentService.createTextOutput(JSON.stringify({ status: "ok", message: "Unknown action ignored" }))
+    return ContentService.createTextOutput(JSON.stringify({ status: &quot;ok&quot;, message: &quot;Unknown action ignored&quot; }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))
+    return ContentService.createTextOutput(JSON.stringify({ status: &quot;error&quot;, message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   } finally {
     if (hasLock) {
@@ -4304,7 +4464,8 @@ function doPost(e) {
       } catch (ign) {}
     }
   }
-}</pre>
+}
+</pre>
         </div>
         <div class="sheet-foot">
             <button type="button" class="btn" onclick="closeGoogleScriptModal()">Закрыть</button>
@@ -4391,10 +4552,41 @@ function doPost(e) {
     <div class="sheet wide">
         <div class="sheet-grip"></div>
         <div class="sheet-head">
-            <h2 id="helpModalTitle" style="display:flex;align-items:center;gap:8px"><svg class="i" aria-hidden="true"><use href="#i-help"></use></svg> Справка и руководство SmenaSps v1.01</h2>
+            <h2 id="helpModalTitle" style="display:flex;align-items:center;gap:8px"><svg class="i" aria-hidden="true"><use href="#i-help"></use></svg> Справка и руководство SmenaSps v1.1</h2>
             <button type="button" class="icon-btn" onclick="closeHelpModal()" aria-label="Закрыть"><svg class="i" aria-hidden="true"><use href="#i-x"></use></svg></button>
         </div>
         <div class="sheet-body doc">
+            <!-- БЛОК ПРОВЕРКИ РЕЛИЗОВ GITHUB И АВТООБНОВЛЕНИЯ ПРИ ОТКРЫТИИ СПРАВКИ -->
+            <div class="help-update-banner" id="helpUpdateBanner">
+                <div class="help-update-top">
+                    <div class="help-update-title">
+                        <svg class="i" aria-hidden="true"><use href="#i-cloud"></use></svg>
+                        <span id="helpUpdateHeadline">Версия приложения: SmenaSps v1.1.0</span>
+                        <span class="badge badge-info" id="helpUpdateBadge">Проверка GitHub…</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                        <button type="button" class="btn btn-sm" id="btnCheckUpdatesNow" onclick="checkForAppUpdates({manual:true})">
+                            <svg class="i" aria-hidden="true"><use href="#i-refresh"></use></svg> Проверить обновления
+                        </button>
+                        <a class="btn btn-sm" id="linkGithubReleases" href="https://github.com/Astapovo/Smenasps/releases" target="_blank" rel="noopener noreferrer">
+                            <svg class="i" aria-hidden="true"><use href="#i-globe"></use></svg> Релизы GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="help-update-meta" id="helpUpdateStatusText">
+                    Проверяем наличие новых релизов в репозитории <b>Astapovo/Smenasps</b>…
+                </div>
+                <div class="help-update-notes" id="helpUpdateReleaseNotes" hidden=""></div>
+                <div class="help-update-actions" id="helpUpdateActionsRow" hidden="">
+                    <button type="button" class="btn btn-primary btn-sm" id="btnApplyAppUpdate" onclick="applyAppUpdateNow()">
+                        <svg class="i" aria-hidden="true"><use href="#i-download"></use></svg> <span id="btnApplyAppUpdateLabel">Обновить приложение сейчас</span>
+                    </button>
+                    <a class="btn btn-sm" id="btnOpenReleasePage" href="https://github.com/Astapovo/Smenasps/releases/latest" target="_blank" rel="noopener noreferrer">
+                        Список изменений на GitHub
+                    </a>
+                </div>
+            </div>
+
             <div class="help-tabs" role="tablist" id="helpTabsBar">
                 <button type="button" class="tab active" data-help-tab="overview" onclick="switchHelpTab('overview')">Обзор функций</button>
                 <button type="button" class="tab" data-help-tab="setup" onclick="switchHelpTab('setup')">Первая настройка</button>
@@ -4406,45 +4598,45 @@ function doPost(e) {
             <!-- ВКЛАДКА 1: ОБЗОР ФУНКЦИОНАЛА -->
             <div class="help-pane active" id="help-pane-overview">
                 <div class="callout" style="margin-top:0">
-                    <b>SmenaSps v1.01</b> — автономное веб-приложение (Offline-First PWA) для ведения журнала смены, базы знаний и чек-листов обхода. Работает на смартфонах, планшетах, ТСД и ПК без доступа к интернету.
+                    <b>SmenaSps v1.1</b> — автономное веб-приложение (Offline-First PWA) для ведения оперативного журнала смены, базы знаний и чек-листов обхода. Работает на смартфонах, планшетах, ТСД и ПК даже при полном отсутствии интернета.
                 </div>
                 <div class="help-card">
                     <h4><svg class="i" aria-hidden="true"><use href="#i-journal"></use></svg> 1. Журнал отказов и Сигнальная башня (Andon)</h4>
                     <ul>
-                        <li><b>Сигнальная башня:</b> светофор состояния объекта (Зелёный — штатно, Янтарный — ожидание ЗИП/подрядчика, Красный пульсирующий — активные сбои «В работе»).</li>
-                        <li><b>Шкала времени смены (Timeline):</b> диаграмма простоев за 12-часовую смену с быстрым переходом в карточку сбоя.</li>
-                        <li><b>Учёт времени устранения:</b> автоматический расчёт времени простоя (в минутах), генерация кода инцидента (<code>ИНИЦИАЛЫ/ММДД/ЧЧММ</code>) и применение шаблонов ремонта.</li>
-                        <li><b>Экспорт отчета:</b> нажатие на код инцидента копирует готовый отчёт в буфер обмена для отправки в мессенджеры.</li>
+                        <li><b>Сигнальная башня в шапке:</b> живой светофор состояния объекта (Зелёный — штатно, Янтарный — ожидание ЗИП/подрядчика, Красный пульсирующий — активные сбои «В работе»).</li>
+                        <li><b>Шкала времени смены (Timeline):</b> визуальная диаграмма всех простоев за текущую 12-часовую смену с быстрым переходом к карточке сбоя.</li>
+                        <li><b>Точный учёт даты и времени устранения:</b> автоматический расчёт времени простоя (в минутах) с поддержкой многосуточных сбоев, генерация кода инцидента (<code>ИНИЦИАЛЫ/ММДД/ЧЧММ</code>) и подстановка шаблонов ремонта.</li>
+                        <li><b>Копирование карточки в 1 тап:</b> нажатие на плашку кода инцидента копирует готовый отчёт для отправки в Telegram / WhatsApp.</li>
                     </ul>
                 </div>
                 <div class="help-card">
                     <h4><svg class="i" aria-hidden="true"><use href="#i-book"></use></svg> 2. Инженерная База Знаний</h4>
                     <ul>
-                        <li>Структурированный справочник с мгновенным офлайн-поиском.</li>
-                        <li>Добавление персональных практических заметок с синхронизацией через облако.</li>
+                        <li>Структурированный справочник по разделам с мгновенным офлайн-поиском.</li>
+                        <li>Добавление <b>собственных практических заметок</b> прямо со смартфона с синхронизацией между коллегами через облако.</li>
                     </ul>
                 </div>
                 <div class="help-card">
-                    <h4><svg class="i" aria-hidden="true"><use href="#i-checks"></use></svg> 3. Модуль «Смена»: Обходы и задачи</h4>
+                    <h4><svg class="i" aria-hidden="true"><use href="#i-checks"></use></svg> 3. Модуль «Смена»: Мульти-чеклисты обхода и Передача смены</h4>
                     <ul>
-                        <li><b>Мульти-чеклисты:</b> поддержка регламентных обходов и дополнительных чек-листов (например, осмотр шкафов, LOTO), настраиваемых администратором в режиме ROOT.</li>
-                        <li><b>Прогресс и запись в журнал:</b> отслеживание выполнения (<code>X из Y</code> и <code>%</code>) и отправка итогового рапорта в журнал сбоев в один клик.</li>
-                        <li><b>Передача смены:</b> лента событий, оповещения руководства и поручения с отметкой о выполнении.</li>
+                        <li><b>Несколько независимых чек-листов обхода:</b> дежурный может проходить как основной «Регламентный сменный обход (Приём смены)», так и дополнительные чек-листы, созданные администратором в режиме ROOT (например, еженедельный осмотр шкафов, проверка безопасности LOTO и др.).</li>
+                        <li><b>Живой прогресс и отчёт в журнал:</b> каждый чек-лист считает прогресс (<code>X из Y</code> и <code>%</code>) и позволяет в 1 клик записать итоговый рапорт в журнал сбоев.</li>
+                        <li><b>Лента смены и задачи руководства:</b> передача смены, важные оповещения и поручения с чекбоксом выполнения.</li>
                     </ul>
                 </div>
                 <div class="help-card">
-                    <h4><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg> 4. Отчёты и визуал</h4>
+                    <h4><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg> 4. Отчёты, Экспорт, Темы и Ширина экрана ПК</h4>
                     <ul>
-                        <li>Выгрузка сводки за смену в буфер обмена. Экспорт журнала в <b>CSV (для Excel)</b> и <b>JSON</b>.</li>
-                        <li><b>6 цветовых тем</b> и настройка ширины интерфейса ПК (1024px / 1360px / 100%) в меню <code>Настройки → Тема и экран</code>.</li>
+                        <li>Формирование сводки за смену в буфер обмена за 1 клик, выгрузка журнала в <b>CSV (для Excel)</b> и <b>JSON</b>.</li>
+                        <li><b>6 цветовых тем</b> и выбор <b>ширины отображения на мониторе ПК</b> (1024px / 1360px / 100%) в разделе <code>Настройки → Тема и экран</code>.</li>
                     </ul>
                 </div>
                 <div class="help-card">
-                    <h4><svg class="i" aria-hidden="true"><use href="#i-shield"></use></svg> 5. Требования к среде</h4>
+                    <h4><svg class="i" aria-hidden="true"><use href="#i-shield"></use></svg> 5. Что нужно для корректной работы SmenaSps v1.1</h4>
                     <ul>
-                        <li><b>Браузер:</b> Chrome, Edge, Яндекс.Браузер, Safari или Firefox. Использование режима «Инкогнито» запрещено (требуется доступ к <code>localStorage</code>).</li>
-                        <li><b>Хостинг HTTPS (GitHub Pages):</b> необходим для работы <code>Service Worker (sw.js)</code> и установки приложения на главный экран.</li>
-                        <li><b>Google Apps Script:</b> при публикации <code>Code.gs</code> укажите <i>«Запуск от имени: Я»</i> и <i>«У кого есть доступ: Все (Anyone)»</i>.</li>
+                        <li><b>Современный браузер:</b> Chrome, Edge, Яндекс.Браузер, Safari или Firefox на Android, iOS или ПК (не в режиме «Инкогнито», чтобы сохранялся <code>localStorage</code>).</li>
+                        <li><b>Протокол HTTPS (GitHub Pages):</b> необходим для работы офлайн-кэша <code>Service Worker (sw.js)</code> и установки приложения на главный экран.</li>
+                        <li><b>Доступ «Все (Anyone)» в Google Apps Script:</b> при публикации <code>Code.gs</code> укажите <i>«Запуск от имени: Я»</i> и <i>«У кого есть доступ: Все (Anyone)»</i>.</li>
                     </ul>
                 </div>
             </div>
@@ -4509,19 +4701,28 @@ function doPost(e) {
             <!-- ВКЛАДКА 4: GITHUB И PWA -->
             <div class="help-pane" id="help-pane-github">
                 <div class="help-card">
-                    <h4><svg class="i" aria-hidden="true"><use href="#i-globe"></use></svg> Размещение на GitHub Pages</h4>
+                    <h4><svg class="i" aria-hidden="true"><use href="#i-cloud"></use></svg> Официальный репозиторий и Автообновление</h4>
+                    <ul>
+                        <li><b>Репозиторий проекта:</b> <a href="https://github.com/Astapovo/Smenasps" target="_blank" rel="noopener noreferrer">github.com/Astapovo/Smenasps</a> (веб-терминал: <a href="https://astapovo.github.io/Smenasps/" target="_blank" rel="noopener noreferrer">astapovo.github.io/Smenasps</a>).</li>
+                        <li><b>Автопроверка при открытии Справки (<code>?</code>):</b> каждый раз при открытии этого окна приложение автоматически опрашивает <b>GitHub Releases API</b> (<code>Astapovo/Smenasps/releases/latest</code>), манифест <code>version.json</code> и проверяет <code>Service Worker</code>.</li>
+                        <li><b>Обновление в 1 клик без потери данных:</b> при выходе новой версии вверху окна Справки загорается сигнальный баннер с описанием релиза и кнопкой <b>«Обновить приложение сейчас»</b>. При нажатии очищается только кэш старых файлов оболочки (<code>sw.js</code>), а все ваши записи журнала, настройки и ключи синхронизации в <code>localStorage</code> полностью сохраняются.</li>
+                    </ul>
+                </div>
+                <div class="help-card">
+                    <h4><svg class="i" aria-hidden="true"><use href="#i-globe"></use></svg> Как выпускать новые релизы на GitHub (Astapovo/Smenasps)</h4>
                     <ol>
-                        <li>Создайте публичный репозиторий на GitHub (например, <code>smenasps</code>).</li>
-                        <li>Загрузите в корень репозитория файлы: <code>index.html</code>, <code>manifest.json</code>, <code>sw.js</code>, <code>Code.gs</code>, <code>SmenaSps_Master_Database.json</code>, <code>README.md</code> и папку <code>icons/</code>.</li>
-                        <li>Перейдите в <b>Settings → Pages</b>, выберите ветку <code>main</code> (папка <code>/root</code>) и нажмите <b>Save</b>.</li>
-                        <li>Через 1 минуту приложение будет доступно по HTTPS-ссылке <code>https://ваш-логин.github.io/smenasps/</code> с поддержкой установки PWA и работы офлайн.</li>
+                        <li>Загрузите файлы релиза (<code>index.html</code>, <code>sw.js</code>, <code>manifest.json</code>, <code>version.json</code>, <code>Code.gs</code>, <code>SmenaSps_Master_Database.json</code>, <code>README.md</code>, <code>icons/</code> и <code>.github/workflows/release.yml</code>) в ветку <code>main</code> репозитория <a href="https://github.com/Astapovo/Smenasps" target="_blank" rel="noopener noreferrer">Astapovo/Smenasps</a>.</li>
+                        <li><b>Способ 1 (Автоматический через GitHub Actions):</b> создайте тег версии (например, <code>v1.1.0</code>) или откройте вкладку <b>Actions → Publish SmenaSps Release &amp; Pages → Run workflow</b>. Скрипт сам соберёт ZIP-архив релиза и опубликует его в разделе <b>Releases</b>.</li>
+                        <li><b>Способ 2 (Вручную через веб-интерфейс GitHub):</b> на странице репозитория справа нажмите <b>Releases → Draft a new release</b>, укажите тег <code>v1.1.0</code> (при выпуске следующего обновления — <code>v1.2.0</code> и обновите поле <code>"version"</code> в <code>version.json</code>), добавьте описание изменений и нажмите <b>Publish release</b>.</li>
+                        <li>Все открытые копии приложения сразу увидят новую версию при открытии Справки (<code>?</code>) и предложат обновиться.</li>
                     </ol>
                 </div>
                 <div class="help-card">
-                    <h4><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg> Установка как приложения (PWA)</h4>
+                    <h4><svg class="i" aria-hidden="true"><use href="#i-download"></use></svg> Умное скрытие кнопки «Установить PWA»</h4>
                     <ul>
-                        <li>Если приложение ещё не установлено на устройство, в меню <b>«Настройки»</b> отображается специальный значок <b>«Установить PWA»</b> (как только приложение установлено и запущено с главного экрана, этот пункт автоматически скрывается).</li>
-                        <li>На <b>iOS (Safari)</b> нажмите кнопку «Поделиться» и выберите «На экран «Домой»».</li>
+                        <li>Пока приложение открыто во вкладке браузера и ещё не установлено, в меню <b>«Настройки»</b> отображается значок <b>«Установить PWA»</b>.</li>
+                        <li>Как только приложение установлено на устройство или запущено с главного экрана/рабочего стола в режиме <code>standalone</code>, кнопка, плитка и раздел <b>«Установить PWA» автоматически скрываются</b> во всех меню.</li>
+                        <li>На <b>iOS (Safari)</b> для установки нажмите кнопку «Поделиться» и выберите «На экран «Домой»».</li>
                     </ul>
                 </div>
             </div>
@@ -5798,7 +5999,11 @@ function showSettingsHub() {
 
 function openSingleSettingsCategory(catId) {
     closeSettingsPopMenu();
-    const targetId = catId || "profile";
+    let targetId = catId || "profile";
+    if (targetId === "pwa_install" && isPwaStandalone()) {
+        showSettingsHub();
+        return;
+    }
     activeSettingsCategory = targetId;
 
     // Переключаем основной вид на view-settings без сброса в хаб
@@ -5938,6 +6143,7 @@ function openHelpModal(tabName) {
     openModal("modalHelp");
     Haptics.tap();
     AudioFx.play("tap");
+    checkForAppUpdates({ manual: false });
 }
 function closeHelpModal() {
     closeModal("modalHelp");
@@ -7497,7 +7703,7 @@ const SEED_SHIFT_MESSAGES = [
     {
         "id": "smsg-demo-1",
         "type": "leader_task",
-        "text": "🎓 [ОБУЧЕНИЕ] Добро пожаловать в SmenaSps v1.01! Пройдите тестовый сменный обход выше, нажмите кнопку «?» (Справка) в шапке для изучения функций и попробуйте переключить цветовую тему (кнопка палитры в шапке). Когда настроите приложение под свой объект — очистите учебные данные в разделе Настройки.",
+        "text": "🎓 [ОБУЧЕНИЕ] Добро пожаловать в SmenaSps v1.0! Пройдите тестовый сменный обход выше, нажмите кнопку «?» (Справка) в шапке для изучения функций и попробуйте переключить цветовую тему (кнопка палитры в шапке). Когда настроите приложение под свой объект — очистите учебные данные в разделе Настройки.",
         "author": "Морозов Илья Николаевич",
         "shift": "day",
         "date": "2026-10-29",
@@ -7973,15 +8179,6 @@ function saveSingleChecklistReport(groupName) {
     const grp = groupName || DEFAULT_CHECKLIST_GROUP;
     const grpItems = (db_checklists || []).filter((it) => getChecklistItemGroup(it) === grp);
     const doneCount = grpItems.filter((it) => !!checklistState[it.id]).length;
-    const totalCount = grpItems.length;
-    
-    let descText = `Выполнен чек-лист «${grp}» (${doneCount}/${totalCount} пунктов).`;
-    if (doneCount === totalCount && totalCount > 0) {
-        descText += ` Замечаний, препятствующих штатной работе, не выявлено.`;
-    } else {
-        descText += ` Внимание: чек-лист заполнен не полностью!`;
-    }
-    
     const now = new Date();
     const timeStr = localTime(now);
     const dateStr = localDate(now);
@@ -7999,7 +8196,7 @@ function saveSingleChecklistReport(groupName) {
         tag: "ЧЕК-ЛИСТ",
         level: "1",
         status: "Устранено",
-        desc: descText,
+        desc: `Выполнен чек-лист «${grp}» (${doneCount}/${grpItems.length} пунктов). Замечаний, препятствующих штатной работе, не выявлено.`,
         engineer: $("settingEngineer").value,
         updatedAt: now.toISOString()
     });
@@ -8920,7 +9117,7 @@ function downloadSelfContainedHTML() {
 }
 function exportMasterConfig() {
     const master = {
-        appName: "SmenaSps_Journal", exportDate: new Date().toISOString(), version: "1.0.0",
+        appName: "SmenaSps_Journal", exportDate: new Date().toISOString(), version: "1.1.0",
         databases: {
             zones: db_zones,
             equipment: db_equipment,
@@ -8967,17 +9164,90 @@ function handleMasterImport(e) {
 /* ==========================================================================
    16. ОТЧЁТЫ
    ========================================================================== */
+function formatDateRu(isoDate) {
+    if (!isoDate) return "";
+    const s = String(isoDate).trim();
+    const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return `${m[3]}.${m[2]}.${m[1]}`;
+    return s;
+}
+
+function formatDowntimeHhMm(mins) {
+    const total = Math.max(0, parseInt(mins, 10) || 0);
+    const hh = String(Math.floor(total / 60)).padStart(2, "0");
+    const mm = String(total % 60).padStart(2, "0");
+    return `${hh}:${mm}`;
+}
+
+function formatCleanExcelDesc(desc) {
+    if (!desc) return "";
+    return String(desc)
+        .replace(/\s*\|\s*Принятые меры:\s*/gi, ". ")
+        .replace(/\r?\n+/g, " ")
+        .replace(/\t+/g, " ")
+        .trim();
+}
+
+function formatIncidentToExcel11Cols(item) {
+    const dateRu = formatDateRu(item.date);
+    const tStart = item.timeStart || "";
+    const tEnd = item.timeEnd || "";
+    const durHhMm = formatDowntimeHhMm(item.downtime);
+    const eq = item.equipment || "";
+    const zone = item.zone || "";
+    const tag = item.tag || "";
+    const cleanDesc = formatCleanExcelDesc(item.desc);
+    const eng = item.engineer || "";
+    const st = item.status || "Устранено";
+    const code = item.code || generateIncidentCode(item.engineer, item.date, item.timeStart);
+    return [dateRu, tStart, tEnd, durHhMm, eq, zone, tag, cleanDesc, eng, st, code];
+}
+
+function getSortedIncidentsForExcel(shiftOnly) {
+    let list = incidents.slice();
+    if (shiftOnly) {
+        const w = currentShift();
+        const startMs = w.start.getTime(), endMs = w.end.getTime();
+        list = list.filter((i) => {
+            const s = tsOf(i.date, i.timeStart);
+            return !isNaN(s) && s >= startMs && s < endMs;
+        });
+    }
+    return list.sort((a, b) => tsOf(a.date, a.timeStart) - tsOf(b.date, b.timeStart));
+}
+
+function copyExcelTableRows(shiftOnly) {
+    let list = getSortedIncidentsForExcel(shiftOnly);
+    if (shiftOnly && list.length === 0) {
+        list = getSortedIncidentsForExcel(false);
+        if (list.length === 0) {
+            uiAlert("Журнал пуст, копировать нечего.");
+            return;
+        }
+        showToast("За текущую смену записей нет — скопирован весь журнал (" + list.length + " стр.)");
+    } else if (list.length === 0) {
+        uiAlert("Журнал пуст, копировать нечего.");
+        return;
+    }
+    const tsvRows = list.map((item) => formatIncidentToExcel11Cols(item).join("\t"));
+    copyToClipboard(tsvRows.join("\r\n"));
+    Haptics.success();
+    if (!shiftOnly || list.length > 0) {
+        showToast(`Скопировано строк для Excel: ${list.length}. Откройте Excel и нажмите Ctrl+V!`);
+    }
+}
+
 function exportToCSV() {
     if (incidents.length === 0) { uiAlert("Журнал пуст, выгружать нечего."); return; }
-    const headers = ["№ п/п", "Код инцидента", "Дата", "Время фиксации", "Конвейер (Зона)", "Оборудование / Узел", "Идентификатор", "Уровень", "Статус", "Время устранения", "Простой (мин)", "Описание ситуации / Принятые меры", "Должностное лицо"];
+    const headers = ["Дата", "Время начала", "Время окончания", "Простой", "Оборудование", "Зона (Участок)", "Узел / Номер", "Описание и выполненные работы", "ФИО специалиста", "Статус", "Код записи"];
     const q = (v) => `"${String(v === undefined || v === null ? "" : v).replace(/"/g, '""')}"`;
+    const sorted = getSortedIncidentsForExcel(false);
     const rows = [headers.map(q).join(";")];
-    incidents.forEach((item, index) => {
-        const code = item.code || generateIncidentCode(item.engineer, item.date, item.timeStart);
-        rows.push([index + 1, code, item.date, item.timeStart, item.zone, item.equipment, item.tag || "", "Уровень " + item.level, item.status, item.timeEnd || "", item.downtime || 0, item.desc, item.engineer].map(q).join(";"));
+    sorted.forEach((item) => {
+        rows.push(formatIncidentToExcel11Cols(item).map(q).join(";"));
     });
-    downloadBlob("\uFEFF" + rows.join("\r\n"), "text/csv;charset=utf-8;", `Черн_ЖУРНАЛ_ОТКАЗОВ_${localDate()}.csv`);
-    showToast("CSV выгружен в загрузки");
+    downloadBlob("\uFEFF" + rows.join("\r\n"), "text/csv;charset=utf-8;", `SmenaSps_Excel_11cols_${localDate()}.csv`);
+    showToast("Таблица для Excel (11 колонок) выгружена в CSV");
 }
 function exportToJSON() {
     const data = { exportDate: new Date().toISOString(), incidents, engineer: $("settingEngineer").value };
@@ -9990,29 +10260,68 @@ function sanitizeLoadedData() {
 }
 
 /* ==========================================================================
-   20. PWA ПОДДЕРЖКА, ОФЛАЙН-РЕЖИМ И SERVICE WORKER
+   20. PWA ПОДДЕРЖКА, УМНОЕ СКРЫТИЕ КНОПКИ УСТАНОВКИ И АВТООБНОВЛЕНИЕ С GITHUB
    ========================================================================== */
+const APP_VERSION = '1.1.0';
+const GITHUB_REPO = 'Astapovo/Smenasps';
+const GITHUB_RELEASES_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
+const GITHUB_RELEASES_WEB = `https://github.com/${GITHUB_REPO}/releases`;
+const GITHUB_RAW_VERSION_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/version.json`;
+
 let deferredInstallPrompt = null;
+let swRegistrationRef = null;
+let swWaitingWorker = null;
+let latestReleaseState = {
+    checking: false,
+    lastCheckTs: 0,
+    hasUpdate: false,
+    swUpdateReady: false,
+    currentVersion: APP_VERSION,
+    latestVersion: APP_VERSION,
+    releaseTitle: '',
+    releaseNotes: '',
+    releaseDate: '',
+    releaseUrl: GITHUB_RELEASES_WEB,
+    error: null
+};
 
 function initPwa() {
     updatePwaStatusDisplay();
+    detectInstalledRelatedPwa();
     updateNetworkStatus();
     registerServiceWorker();
     handleUrlShortcuts();
 
+    // Динамическое отслеживание переключения режима окна (например, при открытии установленного PWA)
+    if (window.matchMedia) {
+        ['(display-mode: standalone)', '(display-mode: window-controls-overlay)', '(display-mode: fullscreen)', '(display-mode: minimal-ui)'].forEach((q) => {
+            try {
+                const mql = window.matchMedia(q);
+                const onChange = () => updatePwaStatusDisplay();
+                if (mql.addEventListener) mql.addEventListener('change', onChange);
+                else if (mql.addListener) mql.addListener(onChange);
+            } catch (e) { /* ok */ }
+        });
+    }
+
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
+        if (isPwaStandalone()) {
+            deferredInstallPrompt = null;
+            updatePwaStatusDisplay();
+            return;
+        }
         deferredInstallPrompt = e;
-        const btn = $('btnPwaInstall');
-        if (btn) btn.style.display = 'inline-flex';
+        updatePwaStatusDisplay();
         const hint = $('pwaInstallHint');
         if (hint) hint.textContent = 'Нажмите кнопку выше, чтобы добавить значок терминала на главный экран устройства.';
     });
 
     window.addEventListener('appinstalled', () => {
         deferredInstallPrompt = null;
+        try { localStorage.setItem('smenasps_pwa_installed', 'true'); } catch (e) { /* ok */ }
         updatePwaStatusDisplay();
-        showToast('Приложение SmenaSps v1.01 установлено на устройство!');
+        showToast(`Приложение SmenaSps v${APP_VERSION} установлено! Кнопка установки скрыта.`);
     });
 
     window.addEventListener('online', () => {
@@ -10021,12 +10330,30 @@ function initPwa() {
         if (getGoogleScriptUrl()) {
             syncWithCloud({ quiet: true });
         }
+        setTimeout(() => checkForAppUpdates({ quiet: true }), 2000);
     });
 
     window.addEventListener('offline', () => {
         updateNetworkStatus();
         showToast('Связь потеряна: автономный офлайн-режим активен.');
     });
+
+    // Фоновая тихая проверка новой версии на GitHub через 3.5 сек после старта
+    if (navigator.onLine) {
+        setTimeout(() => checkForAppUpdates({ quiet: true }), 3500);
+    }
+}
+
+async function detectInstalledRelatedPwa() {
+    try {
+        if ('getInstalledRelatedApps' in navigator && typeof navigator.getInstalledRelatedApps === 'function') {
+            const related = await navigator.getInstalledRelatedApps();
+            if (Array.isArray(related) && related.length > 0) {
+                localStorage.setItem('smenasps_pwa_installed', 'true');
+                updatePwaStatusDisplay();
+            }
+        }
+    } catch (e) { /* ok */ }
 }
 
 function updateNetworkStatus() {
@@ -10056,21 +10383,29 @@ function updateNetworkStatus() {
 
 function registerServiceWorker() {
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:' || location.hostname === 'localhost')) {
-        navigator.serviceWorker.register('./sw.js', { scope: './' })
+        navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' })
             .then((reg) => {
+                swRegistrationRef = reg;
                 console.log('[PWA] ServiceWorker зарегистрирован:', reg.scope);
+                if (reg.waiting) {
+                    swWaitingWorker = reg.waiting;
+                    latestReleaseState.swUpdateReady = true;
+                    latestReleaseState.hasUpdate = true;
+                    renderHelpUpdateBanner();
+                }
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     if (newWorker) {
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showToast('Доступно обновление SmenaSps v1.01', {
+                                swWaitingWorker = newWorker;
+                                latestReleaseState.swUpdateReady = true;
+                                latestReleaseState.hasUpdate = true;
+                                renderHelpUpdateBanner();
+                                showToast(`Доступна новая версия SmenaSps!`, {
                                     action: {
                                         label: 'Обновить',
-                                        fn: () => {
-                                            newWorker.postMessage({ action: 'skipWaiting' });
-                                            window.location.reload();
-                                        }
+                                        fn: () => applyAppUpdateNow()
                                     }
                                 });
                             }
@@ -10081,15 +10416,295 @@ function registerServiceWorker() {
             .catch((err) => {
                 console.warn('[PWA] Регистрация ServiceWorker пропущена (безопасный режим):', err);
             });
+
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (window.__smenaspsReloading) return;
+            window.__smenaspsReloading = true;
+            window.location.reload();
+        });
+    }
+}
+
+function normalizeSemver(verStr) {
+    const clean = String(verStr || '').trim().replace(/^[vV\s]+/, '').split(/[-+]/)[0];
+    const parts = clean.split('.').map((n) => parseInt(n, 10) || 0);
+    while (parts.length < 3) parts.push(0);
+    return parts.slice(0, 3);
+}
+
+function compareSemver(vA, vB) {
+    const a = normalizeSemver(vA);
+    const b = normalizeSemver(vB);
+    for (let i = 0; i < 3; i++) {
+        if (a[i] > b[i]) return 1;
+        if (a[i] < b[i]) return -1;
+    }
+    return 0;
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs || 6500);
+    try {
+        const res = await fetch(url, Object.assign({}, options || {}, { signal: ctrl.signal }));
+        clearTimeout(timer);
+        return res;
+    } catch (err) {
+        clearTimeout(timer);
+        throw err;
+    }
+}
+
+async function checkForAppUpdates(opts) {
+    opts = opts || {};
+    if (latestReleaseState.checking) return;
+    const now = Date.now();
+    // Не спамим сеть при частом открытии окна Справки (если прошло менее 25 секунд и это не ручное нажатие)
+    if (!opts.manual && latestReleaseState.lastCheckTs && (now - latestReleaseState.lastCheckTs < 25000)) {
+        renderHelpUpdateBanner();
+        return;
+    }
+
+    latestReleaseState.checking = true;
+    latestReleaseState.error = null;
+    renderHelpUpdateBanner();
+
+    if (!navigator.onLine) {
+        latestReleaseState.checking = false;
+        latestReleaseState.error = 'offline';
+        renderHelpUpdateBanner();
+        if (opts.manual) showToast('Нет сети: проверка обновлений недоступна в офлайн-режиме');
+        return;
+    }
+
+    // 1. Запрашиваем обновление Service Worker у браузера
+    if (swRegistrationRef && typeof swRegistrationRef.update === 'function') {
+        try { await swRegistrationRef.update(); } catch (e) { /* ok */ }
+        if (swRegistrationRef.waiting) {
+            swWaitingWorker = swRegistrationRef.waiting;
+            latestReleaseState.swUpdateReady = true;
+        }
+    }
+
+    let foundRemote = null;
+
+    // 2. Опрашиваем официальный GitHub Releases API (Astapovo/Smenasps)
+    try {
+        const relRes = await fetchWithTimeout(GITHUB_RELEASES_API + '?_=' + now, {
+            headers: { 'Accept': 'application/vnd.github+json' },
+            cache: 'no-store'
+        }, 6000);
+        if (relRes && relRes.ok) {
+            const relData = await relRes.json();
+            if (relData && (relData.tag_name || relData.name)) {
+                const rawVer = String(relData.tag_name || relData.name).replace(/^[vV\s]+/, '').trim();
+                foundRemote = {
+                    version: rawVer || APP_VERSION,
+                    title: String(relData.name || relData.tag_name || '').trim(),
+                    notes: String(relData.body || '').trim(),
+                    date: relData.published_at ? new Date(relData.published_at).toLocaleDateString('ru-RU') : '',
+                    url: relData.html_url || GITHUB_RELEASES_WEB
+                };
+            }
+        }
+    } catch (e) { /* fallback to version.json */ }
+
+    // 3. Также проверяем локальный/хостинговый version.json и Raw GitHub (если релиз выложен коммитом или в version.json версия новее)
+    const versionUrls = ['./version.json?_=' + now, GITHUB_RAW_VERSION_URL + '?_=' + now];
+    for (const vUrl of versionUrls) {
+        try {
+            const vRes = await fetchWithTimeout(vUrl, { cache: 'no-store' }, 4500);
+            if (vRes && vRes.ok) {
+                const vData = await vRes.json();
+                if (vData && vData.version) {
+                    const cleanVer = String(vData.version).replace(/^[vV\s]+/, '').trim();
+                    if (!foundRemote || compareSemver(cleanVer, foundRemote.version) > 0) {
+                        foundRemote = {
+                            version: cleanVer,
+                            title: vData.title || `SmenaSps v${cleanVer}`,
+                            notes: Array.isArray(vData.changelog) ? vData.changelog.map((x) => '• ' + x).join('\n') : String(vData.notes || ''),
+                            date: vData.date || '',
+                            url: vData.releaseUrl || GITHUB_RELEASES_WEB
+                        };
+                    }
+                }
+            }
+        } catch (e) { /* ok */ }
+    }
+
+    latestReleaseState.checking = false;
+    latestReleaseState.lastCheckTs = Date.now();
+
+    if (foundRemote && foundRemote.version) {
+        latestReleaseState.latestVersion = foundRemote.version;
+        latestReleaseState.releaseTitle = foundRemote.title;
+        latestReleaseState.releaseNotes = foundRemote.notes;
+        latestReleaseState.releaseDate = foundRemote.date;
+        latestReleaseState.releaseUrl = foundRemote.url || GITHUB_RELEASES_WEB;
+        const isNewer = compareSemver(foundRemote.version, APP_VERSION) > 0;
+        latestReleaseState.hasUpdate = isNewer || latestReleaseState.swUpdateReady;
+    } else {
+        latestReleaseState.hasUpdate = latestReleaseState.swUpdateReady;
+        if (!latestReleaseState.swUpdateReady) {
+            latestReleaseState.error = 'unreachable';
+        }
+    }
+
+    renderHelpUpdateBanner();
+
+    if (opts.manual) {
+        if (latestReleaseState.hasUpdate) {
+            Haptics.success();
+            AudioFx.play('success');
+            showToast(`Доступна новая версия v${latestReleaseState.latestVersion}!`, {
+                action: { label: 'Обновить', fn: () => applyAppUpdateNow() }
+            });
+        } else {
+            Haptics.tap();
+            showToast(`У вас установлена актуальная версия SmenaSps v${APP_VERSION}`);
+        }
+    } else if (latestReleaseState.hasUpdate && !opts.quiet) {
+        showToast(`На GitHub доступна новая версия SmenaSps v${latestReleaseState.latestVersion}`, {
+            action: { label: 'Обновить', fn: () => applyAppUpdateNow() }
+        });
+    }
+}
+
+function renderHelpUpdateBanner() {
+    const banner = $('helpUpdateBanner');
+    const headline = $('helpUpdateHeadline');
+    const badge = $('helpUpdateBadge');
+    const statusTxt = $('helpUpdateStatusText');
+    const notesBox = $('helpUpdateReleaseNotes');
+    const actionsRow = $('helpUpdateActionsRow');
+    const applyLbl = $('btnApplyAppUpdateLabel');
+    const relLink = $('btnOpenReleasePage');
+    const checkBtn = $('btnCheckUpdatesNow');
+    const helpDot = $('helpUpdateDot');
+
+    if (helpDot) {
+        helpDot.hidden = !latestReleaseState.hasUpdate;
+    }
+    if ($('btnHeaderHelp')) {
+        $('btnHeaderHelp').title = latestReleaseState.hasUpdate
+            ? `Доступно обновление v${latestReleaseState.latestVersion}! Нажмите для открытия Справки и обновления`
+            : 'Справка, руководство и проверка обновлений (Alt+H)';
+    }
+
+    if (!banner) return;
+
+    if (checkBtn) {
+        checkBtn.disabled = !!latestReleaseState.checking;
+        checkBtn.classList.toggle('spin', !!latestReleaseState.checking);
+    }
+
+    if (latestReleaseState.checking) {
+        banner.className = 'help-update-banner';
+        if (headline) headline.textContent = `Версия приложения: SmenaSps v${APP_VERSION}`;
+        if (badge) { badge.className = 'badge badge-info'; badge.textContent = 'Проверка GitHub…'; }
+        if (statusTxt) statusTxt.innerHTML = `Проверяем релизы в репозитории <b>${GITHUB_REPO}</b>…`;
+        if (notesBox) notesBox.hidden = true;
+        if (actionsRow) actionsRow.hidden = true;
+        return;
+    }
+
+    if (latestReleaseState.hasUpdate) {
+        const targetVer = compareSemver(latestReleaseState.latestVersion, APP_VERSION) > 0
+            ? latestReleaseState.latestVersion
+            : APP_VERSION + ' (обновление сборки)';
+        banner.className = 'help-update-banner has-update';
+        if (headline) headline.textContent = `Доступна новая версия: SmenaSps v${targetVer}`;
+        if (badge) { badge.className = 'badge badge-warning'; badge.textContent = 'Есть обновление!'; }
+        const datePart = latestReleaseState.releaseDate ? ` от ${latestReleaseState.releaseDate}` : '';
+        if (statusTxt) {
+            statusTxt.innerHTML = `Установлена версия <b>v${APP_VERSION}</b> · На GitHub опубликован релиз <b>v${targetVer}</b>${datePart}. Все ваши записи и настройки при обновлении сохранятся.`;
+        }
+        if (notesBox) {
+            if (latestReleaseState.releaseNotes) {
+                notesBox.hidden = false;
+                notesBox.textContent = latestReleaseState.releaseNotes;
+            } else {
+                notesBox.hidden = true;
+            }
+        }
+        if (actionsRow) actionsRow.hidden = false;
+        if (applyLbl) applyLbl.textContent = `Обновить приложение до v${targetVer}`;
+        if (relLink) relLink.href = latestReleaseState.releaseUrl || GITHUB_RELEASES_WEB;
+        return;
+    }
+
+    banner.className = 'help-update-banner up-to-date';
+    if (headline) headline.textContent = `Версия приложения: SmenaSps v${APP_VERSION}`;
+    if (latestReleaseState.error === 'offline') {
+        if (badge) { badge.className = 'badge badge-warning'; badge.textContent = 'Офлайн-режим'; }
+        if (statusTxt) statusTxt.textContent = 'Вы работаете автономно без сети. Проверка новых релизов на GitHub выполнится автоматически при появлении интернета.';
+    } else {
+        if (badge) { badge.className = 'badge badge-success'; badge.textContent = 'Актуальная версия'; }
+        const checkedTime = latestReleaseState.lastCheckTs
+            ? new Date(latestReleaseState.lastCheckTs).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+            : '';
+        if (statusTxt) {
+            statusTxt.innerHTML = `У вас установлена самая свежая версия <b>SmenaSps v${APP_VERSION}</b> (репозиторий <a href="${GITHUB_RELEASES_WEB}" target="_blank" rel="noopener noreferrer">${GITHUB_REPO}</a>${checkedTime ? ', проверено в ' + checkedTime : ''}).`;
+        }
+    }
+    if (notesBox) notesBox.hidden = true;
+    if (actionsRow) actionsRow.hidden = true;
+}
+
+async function applyAppUpdateNow() {
+    Haptics.click();
+    AudioFx.play('click');
+    const btn = $('btnApplyAppUpdate');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Загрузка обновления и очистка кэша…';
+    }
+    showToast('Обновляю приложение SmenaSps до новой версии…');
+
+    try {
+        // 1. Если есть ожидающий новый Service Worker — активируем его немедленно
+        if (swWaitingWorker) {
+            swWaitingWorker.postMessage({ action: 'skipWaiting', type: 'SKIP_WAITING' });
+        }
+        if (swRegistrationRef) {
+            if (swRegistrationRef.waiting) {
+                swRegistrationRef.waiting.postMessage({ action: 'skipWaiting', type: 'SKIP_WAITING' });
+            }
+            try { await swRegistrationRef.update(); } catch (e) { /* ok */ }
+        }
+
+        // 2. Очищаем все старые кэши CacheStorage (localStorage с журналом и настройками НЕ затрагивается!)
+        if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((k) => caches.delete(k)));
+        }
+
+        // 3. Перезагружаем страницу с параметром сброса кэша
+        setTimeout(() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('updated', latestReleaseState.latestVersion || Date.now());
+            window.location.replace(url.toString());
+        }, 350);
+    } catch (err) {
+        window.location.reload();
     }
 }
 
 async function promptPwaInstall() {
+    if (isPwaStandalone()) {
+        updatePwaStatusDisplay();
+        showToast('Приложение уже установлено на это устройство');
+        return;
+    }
     if (deferredInstallPrompt) {
         deferredInstallPrompt.prompt();
         const choice = await deferredInstallPrompt.userChoice;
-        if (choice.outcome === 'accepted') {
-            showToast('Установка подтверждена...');
+        if (choice && choice.outcome === 'accepted') {
+            try { localStorage.setItem('smenasps_pwa_installed', 'true'); } catch (e) { /* ok */ }
+            deferredInstallPrompt = null;
+            updatePwaStatusDisplay();
+            showToast('Установка подтверждена! Кнопка установки скрыта.');
+            return;
         }
         deferredInstallPrompt = null;
     } else {
@@ -10103,21 +10718,58 @@ async function promptPwaInstall() {
 }
 
 function isPwaStandalone() {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    try {
+        const mqStandalone = window.matchMedia && (
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.matchMedia('(display-mode: window-controls-overlay)').matches ||
+            window.matchMedia('(display-mode: fullscreen)').matches ||
+            window.matchMedia('(display-mode: minimal-ui)').matches
+        );
+        const iosStandalone = window.navigator.standalone === true;
+        const twaReferrer = typeof document.referrer === 'string' && document.referrer.startsWith('android-app://');
+        if (mqStandalone || iosStandalone || twaReferrer) {
+            try { localStorage.setItem('smenasps_pwa_installed', 'true'); } catch (e) { /* ok */ }
+            return true;
+        }
+        if (localStorage.getItem('smenasps_pwa_installed') === 'true') {
+            return true;
+        }
+    } catch (e) { /* ok */ }
+    return false;
 }
 
 function updatePwaStatusDisplay() {
     const installed = isPwaStandalone();
+    if (installed) {
+        document.documentElement.setAttribute('data-pwa-installed', 'true');
+    } else {
+        document.documentElement.removeAttribute('data-pwa-installed');
+    }
     const badge = $('pwaInstalledBadge');
     const btn = $('btnPwaInstall');
     const hint = $('pwaInstallHint');
+    const card = $('scat-pwa_install');
+
     document.querySelectorAll('.pwa-only-if-not-installed').forEach((el) => {
         el.style.display = installed ? 'none' : '';
+        if (installed) {
+            el.setAttribute('hidden', '');
+            el.setAttribute('aria-hidden', 'true');
+        } else {
+            el.removeAttribute('hidden');
+            el.removeAttribute('aria-hidden');
+        }
     });
+
+    if (card) {
+        card.style.display = installed ? 'none' : '';
+        if (installed) card.classList.remove('active-single');
+    }
+
     if (installed) {
         if (badge) { badge.style.display = 'inline-flex'; badge.textContent = 'Установлено (PWA)'; badge.className = 'badge badge-success'; }
         if (btn) btn.style.display = 'none';
-        if (hint) hint.textContent = 'Приложение запущено как установленное PWA с главного экрана устройства.';
+        if (hint) hint.textContent = 'Приложение установлено на устройство.';
         if (activeSettingsCategory === 'pwa_install') showSettingsHub();
     } else {
         if (badge) { badge.style.display = 'inline-flex'; badge.textContent = 'PWA Готово'; badge.className = 'badge badge-info'; }
@@ -10128,6 +10780,14 @@ function updatePwaStatusDisplay() {
 function handleUrlShortcuts() {
     try {
         const params = new URLSearchParams(window.location.search);
+        if (params.has('updated')) {
+            const ver = params.get('updated');
+            params.delete('updated');
+            const cleanSearch = params.toString();
+            const cleanUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '') + window.location.hash;
+            window.history.replaceState({}, document.title, cleanUrl);
+            setTimeout(() => showToast(`Приложение успешно обновлено до версии v${APP_VERSION}!`), 400);
+        }
         const act = params.get('action');
         if (act === 'new-incident') {
             setTimeout(() => openAddIncidentModal(), 300);

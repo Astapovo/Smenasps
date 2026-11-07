@@ -1,0 +1,19 @@
+{
+  "app": "SmenaSps",
+  "version": "1.1.0",
+  "tag": "v1.1.0",
+  "date": "07.11.2026",
+  "releasedAt": "2026-11-07T12:00:00Z",
+  "repository": "https://github.com/Astapovo/Smenasps",
+  "pagesUrl": "https://astapovo.github.io/Smenasps/",
+  "releaseUrl": "https://github.com/Astapovo/Smenasps/releases/tag/v1.1.0",
+  "title": "SmenaSps v1.1.0 — Автообновление через Справку, GitHub Releases и умное скрытие PWA",
+  "changelog": [
+    "Добавлена автоматическая проверка новых версий с GitHub Releases (Astapovo/Smenasps) и version.json при открытии окна Справки (?)",
+    "Добавлен баннер обновления в 1 клик («Обновить приложение сейчас») со сбросом кэша Service Worker без потери локальных записей",
+    "Усилено автоматическое скрытие кнопки, плитки и раздела «Установить PWA» во всех меню после установки приложения или при запуске в режиме standalone",
+    "Добавлен экспорт таблицы смены и журнала в 11 колонок для прямой вставки в локальный Excel (Ctrl+V и CSV)",
+    "Добавлен конструктор мульти-чеклистов обхода и настраиваемых уровней сбоя в разделе Админ (ROOT)",
+    "Добавлен workflow .github/workflows/release.yml для автоматической сборки и публикации релизов на GitHub"
+  ]
+}

@@ -112,6 +112,47 @@ function statusRank(st) {
   return 1; // "В работе"
 }
 
+
+// Автоматическое формирование красивого листа «Экспорт_Excel» (11 колонок по стандарту локального журнала Excel)
+function rebuildExcelExportSheet(ss, allIncidents) {
+  try {
+    var headers = ["Дата", "Начало", "Окончание", "Простой", "Оборудование", "Участок / Зона", "Узел / №", "Описание и выполненные работы", "ФИО специалиста", "Статус", "Код"];
+    var sh = getOrCreateSheet(ss, "Экспорт_Excel", headers);
+    var sorted = allIncidents.slice().sort(function(a, b) {
+      var da = String(a.date || "") + " " + String(a.timeStart || "00:00");
+      var db = String(b.date || "") + " " + String(b.timeStart || "00:00");
+      return da < db ? -1 : (da > db ? 1 : 0);
+    });
+    var rows = [headers];
+    for (var i = 0; i < sorted.length; i++) {
+      var it = sorted[i];
+      var dStr = String(it.date || "").trim();
+      var m = dStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      var dateRu = m ? (m[3] + "." + m[2] + "." + m[1]) : dStr;
+      var mins = Math.max(0, Number(it.downtime) || 0);
+      var hh = ("0" + Math.floor(mins / 60)).slice(-2);
+      var mm = ("0" + (mins % 60)).slice(-2);
+      var durHhMm = hh + ":" + mm;
+      var cleanDesc = String(it.desc || "").replace(/\s*\|\s*Принятые меры:\s*/gi, ". ").replace(/\r?\n+/g, " ").trim();
+      rows.push([
+        sanitizeDateOrTime(dateRu),
+        sanitizeDateOrTime(it.timeStart || ""),
+        sanitizeDateOrTime(it.timeEnd || ""),
+        sanitizeDateOrTime(durHhMm),
+        sanitize(it.equipment || ""),
+        sanitize(it.zone || ""),
+        sanitize(it.tag || ""),
+        sanitize(cleanDesc),
+        sanitize(it.engineer || ""),
+        sanitize(it.status || "Устранено"),
+        sanitize(it.code || "")
+      ]);
+    }
+    sh.clearContents();
+    sh.getRange(1, 1, rows.length, headers.length).setValues(rows);
+  } catch (err) {}
+}
+
 function getOrCreateSheet(ss, name, headers) {
   var sh = ss.getSheetByName(name);
   if (!sh) {
@@ -233,6 +274,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
           id: exObj.id || incObj.id,
           code: exObj.code || incObj.code,
           date: exObj.date || incObj.date,
+          dateEnd: exObj.dateEnd || incObj.dateEnd || exObj.date || incObj.date,
           timeStart: exObj.timeStart || incObj.timeStart,
           timeEnd: exObj.timeEnd || incObj.timeEnd,
           downtime: Number(exObj.downtime) || Number(incObj.downtime) || 0,
@@ -259,6 +301,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
         id: exObj.id || incObj.id,
         code: incObj.code || exObj.code,
         date: incObj.date || exObj.date,
+        dateEnd: incObj.dateEnd || exObj.dateEnd || incObj.date || exObj.date,
         timeStart: incObj.timeStart || exObj.timeStart,
         timeEnd: incObj.timeEnd || exObj.timeEnd,
         downtime: Number(incObj.downtime) || Number(exObj.downtime) || 0,
@@ -302,6 +345,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
   var finalShift = incObj.shift !== undefined ? incObj.shift : exObj.shift;
   var finalLevel = String(incObj.level || exObj.level || "1");
   var finalDate = incObj.date || exObj.date;
+  var finalDateEnd = incObj.dateEnd || exObj.dateEnd || finalDate;
   var finalTimeStart = incObj.timeStart || exObj.timeStart;
   var finalCode = incObj.code || exObj.code;
 
@@ -328,6 +372,7 @@ function resolveIncidentMerge(exObj, incObj, nowIso) {
       id: exObj.id || incObj.id,
       code: finalCode,
       date: finalDate,
+      dateEnd: finalDateEnd,
       timeStart: finalTimeStart,
       timeEnd: finalTimeEnd,
       downtime: finalDowntime,
@@ -350,18 +395,32 @@ function rowToIncident(row, tz) {
   var code = String(row[1] || "").trim().replace(/^'/, "");
   var date = normalizeSheetDate(row[2], tz);
   var timeStart = normalizeSheetTime(row[3], tz);
+  var timeEnd = normalizeSheetTime(row[4], tz);
+  var dateEndRaw = row.length > 15 ? normalizeSheetDate(row[15], tz) : "";
+  var dateEnd = dateEndRaw || (timeEnd ? date : "");
   var equipment = String(row[6] || "").trim();
+  var mins = Math.max(0, Number(row[5]) || 0);
+  var hh = ("0" + Math.floor(mins / 60)).slice(-2);
+  var mm = ("0" + (mins % 60)).slice(-2);
+  var rawDesc = String(row[9] || "").trim();
+  var cleanDesc = rawDesc.replace(/\s*\|\s*Принятые меры:\s*/gi, ". ").replace(/\r?\n+/g, " ").trim();
+  var mDate = String(date || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  var dateRu = mDate ? (mDate[3] + "." + mDate[2] + "." + mDate[1]) : date;
   return {
     id: ensureDeterministicId(rawId, code, date, timeStart, equipment),
     code: code,
     date: date,
+    dateRu: dateRu,
+    dateEnd: dateEnd,
     timeStart: timeStart,
-    timeEnd: normalizeSheetTime(row[4], tz),
-    downtime: Number(row[5]) || 0,
+    timeEnd: timeEnd,
+    downtime: mins,
+    downtimeHhMm: hh + ":" + mm,
     equipment: equipment,
     tag: String(row[7] || "").trim(),
     zone: String(row[8] || "").trim(),
-    desc: String(row[9] || "").trim(),
+    desc: rawDesc,
+    cleanDesc: cleanDesc,
     engineer: String(row[10] || "").trim(),
     shift: String(row[11] || "").trim(),
     level: String(row[12] || "1").trim(),
@@ -387,7 +446,8 @@ function incidentToRow(item) {
     sanitize(item.shift || ""),
     sanitize(item.level || "1"),
     sanitize(item.status || "В работе"),
-    sanitize(item.updatedAt || new Date().toISOString())
+    sanitize(item.updatedAt || new Date().toISOString()),
+    sanitizeDateOrTime(item.dateEnd || (item.timeEnd ? item.date : ""))
   ];
 }
 
@@ -931,7 +991,7 @@ function doPost(e) {
       var journalHeaders = [
         "ID", "Код инцидента", "Дата", "Время начала", "Время устранения",
         "Простой (мин)", "Оборудование", "Тег/Узел", "Зона", "Описание / Меры",
-        "Инженер", "Смена", "Уровень", "Статус", "Дата обновления"
+        "Инженер", "Смена", "Уровень", "Статус", "Дата обновления", "Дата устранения"
       ];
       var shJ = getOrCreateSheet(ss, SHEET_JOURNAL, journalHeaders);
       var jRaw = shJ.getDataRange().getValues();
@@ -997,6 +1057,7 @@ function doPost(e) {
           id: itemId,
           code: itemCode,
           date: normDate,
+          dateEnd: normalizeSheetDate(item.dateEnd, tz) || (item.timeEnd ? normDate : ""),
           timeStart: normStart,
           timeEnd: normalizeSheetTime(item.timeEnd, tz),
           downtime: Number(item.downtime) || 0,
@@ -1037,6 +1098,7 @@ function doPost(e) {
           outJ.push(incidentToRow(jRecords[jr]));
         }
         shJ.getRange(1, 1, outJ.length, journalHeaders.length).setValues(outJ);
+        rebuildExcelExportSheet(ss, jRecords);
         if (oldJRowCount > outJ.length) {
           shJ.getRange(outJ.length + 1, 1, oldJRowCount - outJ.length, journalHeaders.length).clearContent();
         }
