@@ -1,8 +1,8 @@
 {
   "id": "./index.html",
-  "name": "SmenaSps — Оперативный журнал смены и база знаний v1.3.8",
+  "name": "SmenaSps",
   "short_name": "SmenaSps",
-  "version": "1.3.8",
+  "version": "1.3.9",
   "description": "Автономный оперативный журнал смены, учёт сбоев, база знаний, конструктор мульти-чеклистов обхода и облачная синхронизация через Google Таблицы (Offline-First PWA)",
   "start_url": "./index.html",
   "scope": "./",
