@@ -1,1 +1,56 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#151b1f"/><path d="M110 125h292v72H110zm0 95h205v72H110zm0 95h292v72H110z" fill="#ffc21a"/><circle cx="365" cy="256" r="34" fill="#f2f4f3"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="glow-red" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-amber" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="glow-green" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer Squircle Background -->
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="#10161A"/>
+  <rect x="16" y="16" width="480" height="480" rx="100" fill="#182026" stroke="#F5B818" stroke-width="9"/>
+
+  <!-- Traffic Light Stand -->
+  <rect x="114" y="366" width="22" height="36" fill="#374652"/>
+  <rect x="88" y="396" width="74" height="20" rx="9" fill="#374652"/>
+
+  <!-- Traffic Light Housing -->
+  <rect x="69" y="95" width="112" height="271" rx="22" fill="#1C252C" stroke="#415260" stroke-width="6"/>
+
+  <!-- Lenses -->
+  <rect x="88" y="118" width="74" height="64" rx="14" fill="#EF4444" filter="url(#glow-red)"/>
+  <rect x="96" y="124" width="58" height="10" rx="5" fill="#FFFFFF" fill-opacity="0.22"/>
+
+  <rect x="88" y="199" width="74" height="64" rx="14" fill="#F59E0B" filter="url(#glow-amber)"/>
+  <rect x="96" y="205" width="58" height="10" rx="5" fill="#FFFFFF" fill-opacity="0.22"/>
+
+  <rect x="88" y="280" width="74" height="64" rx="14" fill="#22C55E" filter="url(#glow-green)"/>
+  <rect x="96" y="286" width="58" height="10" rx="5" fill="#FFFFFF" fill-opacity="0.22"/>
+
+  <!-- Main Title -->
+  <text x="212" y="160" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="60" font-weight="800" fill="#F1F5F9" letter-spacing="1">СМЕНА</text>
+
+  <!-- Yellow SPS Pill + Pulse -->
+  <rect x="212" y="177" width="231" height="66" rx="16" fill="#F5B818"/>
+  <text x="228" y="227" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="45" font-weight="900" fill="#0F172A" letter-spacing="1">SPS</text>
+  <polyline points="328,210 348,210 361,190 376,230 391,195 402,210 427,210" fill="none" stroke="#0F172A" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Divider -->
+  <line x1="212" y1="269" x2="448" y2="269" stroke="#415260" stroke-width="3"/>
+
+  <!-- Subtitle -->
+  <text x="212" y="308" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-size="22" font-weight="700" fill="#94A3B8" letter-spacing="1.5">ЖУРНАЛ СМЕНЫ</text>
+
+  <!-- Bottom Status Pill -->
+  <rect x="212" y="330" width="231" height="46" rx="23" fill="#0F231C" stroke="#22C55E" stroke-width="4"/>
+  <circle cx="234" cy="353" r="8" fill="#22C55E"/>
+  <text x="252" y="360" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20" font-weight="700" fill="#F1F5F9">SmenaSps</text>
+</svg>
