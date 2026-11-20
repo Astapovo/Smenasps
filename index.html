@@ -1881,7 +1881,7 @@ html[data-pwa-installed="true"] #scat-pwa_install {
 .root-nav-buttons .tab:focus-visible{outline:3px solid var(--sig);outline-offset:2px}
 @media(max-width:680px){.root-nav-groups{grid-template-columns:1fr}.root-nav-group{padding:9px}.root-nav-buttons .tab{flex:1 1 auto;justify-content:center}}
 
-/* ==================== V1.3.8 ВЫПАДАЮЩИЙ ФИЛЬТР ЗОН И АККУРАТНЫЕ ПАНЕЛИ КНОПОК ==================== */
+/* ==================== V1.3.9 ВЫПАДАЮЩИЙ ФИЛЬТР ЗОН И АККУРАТНЫЕ ПАНЕЛИ КНОПОК ==================== */
 .zone-dropdown-wrap {
   position: relative;
   margin: 0 0 12px;
@@ -2060,7 +2060,7 @@ html[data-pwa-installed="true"] #scat-pwa_install {
   border-top: 1px dashed var(--line-2);
 }
 
-/* ==================== V1.3.8 КОМПАКТНАЯ СТРАНИЦА ОТЧЁТОВ И УНИФИКАЦИЯ СПИСКОВ ==================== */
+/* ==================== V1.3.9 КОМПАКТНАЯ СТРАНИЦА ОТЧЁТОВ И УНИФИКАЦИЯ СПИСКОВ ==================== */
 .export-compact-bar {
   display: flex;
   align-items: center;
@@ -2214,7 +2214,7 @@ html[data-pwa-installed="true"] #scat-pwa_install {
             <h1 class="brand-title">
                 <span class="brand-title-full" id="brandTitleFull">SmenaSps · Журнал смены</span>
                 <span class="brand-title-compact" id="brandTitleCompact">SmenaSps</span>
-                <span class="brand-ver-badge" id="headerAppVersionBadge">v1.3.8</span>
+                <span class="brand-ver-badge" id="headerAppVersionBadge">v1.3.9</span>
                 <button type="button" id="demoModeBadge" class="demo-badge" style="display:none" onclick="openHelpModal('setup')" title="Включён обучающий демо-режим. Нажмите для настройки">ОБУЧЕНИЕ</button>
                 <span class="root-badge">ROOT</span>
                 <span id="netOfflineBadge" class="badge badge-warning" style="display:none;font-size:10px;padding:1px 5px;vertical-align:middle">ОФЛАЙН</span>
@@ -3536,7 +3536,7 @@ html[data-pwa-installed="true"] #scat-pwa_install {
                 <b>Код файла Code.gs</b>
                 <button type="button" class="btn btn-sm btn-primary" onclick="copyGoogleScriptCode()"><svg class="i" aria-hidden="true"><use href="#i-copy"></use></svg> Скопировать скрипт</button>
             </div>
-            <pre class="code" id="googleScriptCodeBlock">// === Google Apps Script: Code.gs (Единый облачный скрипт SmenaSps v1.3.8 — Delta Sync &amp; Multi-Engineer Edition) ===
+            <pre class="code" id="googleScriptCodeBlock">// === Google Apps Script: Code.gs (Единый облачный скрипт SmenaSps v1.3.9 — Delta Sync &amp; Multi-Engineer Edition) ===
 // Поддерживает:
 // 1. Журнал инцидентов (лист «Журнал») — дельта-синхронизация, защита от перезаписи статусов («Устранено»), дедупликация, разрешение конфликтов
 // 2. Сменные сообщения и задачи (лист «Смена_Сообщения») — двусторонняя дельта-синхронизация и статусы задач
@@ -5063,7 +5063,7 @@ function doPost(e) {
                 <div class="help-update-top">
                     <div class="help-update-title">
                         <svg class="i" aria-hidden="true"><use href="#i-cloud"></use></svg>
-                        <span id="helpUpdateHeadline">Версия приложения: SmenaSps v1.3.8</span>
+                        <span id="helpUpdateHeadline">Версия приложения: SmenaSps v1.3.9</span>
                         <span class="badge badge-info" id="helpUpdateBadge">Проверка GitHub…</span>
                     </div>
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
@@ -9864,7 +9864,7 @@ function downloadSelfContainedHTML() {
 }
 function exportMasterConfig() {
     const master = {
-        appName: "SmenaSps_Journal", exportDate: new Date().toISOString(), version: "1.3.8",
+        appName: "SmenaSps_Journal", exportDate: new Date().toISOString(), version: "1.3.9",
         databases: {
             zones: db_zones,
             equipment: db_equipment,
@@ -10959,8 +10959,8 @@ function copyCode(id, okMsg) {
     if (!el) return;
     navigator.clipboard.writeText(el.innerText).then(() => showToast(okMsg)).catch(() => showToast("Выделите текст и нажмите Ctrl+C"));
 }
-function copyGoogleScriptCode() { copyCode("googleScriptCodeBlock", "Код единого Code.gs v1.3.8 скопирован"); }
-function copyUniversalScriptCode() { copyCode("googleScriptCodeBlock", "Код единого Code.gs v1.3.8 скопирован"); }
+function copyGoogleScriptCode() { copyCode("googleScriptCodeBlock", "Код единого Code.gs v1.3.9 скопирован"); }
+function copyUniversalScriptCode() { copyCode("googleScriptCodeBlock", "Код единого Code.gs v1.3.9 скопирован"); }
 
 async function uploadDatabasesToGoogle() {
     const url = getGoogleScriptUrl();
@@ -11071,7 +11071,7 @@ function sanitizeLoadedData() {
 /* ==========================================================================
    20. PWA ПОДДЕРЖКА, УМНОЕ СКРЫТИЕ КНОПКИ УСТАНОВКИ И АВТООБНОВЛЕНИЕ С GITHUB
    ========================================================================== */
-const APP_VERSION = '1.3.8';
+const APP_VERSION = '1.3.9';
 const GITHUB_REPO = 'Astapovo/Smenasps';
 const GITHUB_RELEASES_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
 const GITHUB_RELEASES_WEB = `https://github.com/${GITHUB_REPO}/releases`;
@@ -11644,7 +11644,7 @@ function initApp() {
     initPwa();
     // Master reference baseline: 1.1.0. Migrate only the untouched legacy defaults;
     // preserve any manually customized directories.
-    const MASTER_DB_VERSION = "1.3.8";
+    const MASTER_DB_VERSION = "1.3.9";
     const LEGACY_SEED_ZONES = [
         "Линия 1 · Приёмка и подача (Зона 1)",
         "Линия 2 · Сортировка и конвейеры (Зона 2)",

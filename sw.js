@@ -1,5 +1,5 @@
 // SmenaSps v1.3.9 — resilient offline-first service worker
-const APP_VERSION = '1.3.9.1';
+const APP_VERSION = '1.3.9';
 const CACHE_NAME = `smenasps-${APP_VERSION}-cache`;
 const CORE_ASSETS = [
   './',
