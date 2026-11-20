@@ -1,14 +1,15 @@
 {
   "app": "SmenaSps",
-  "version": "1.3.8",
-  "tag": "v1.3.8",
-  "date": "13.11.2026",
-  "releasedAt": "2026-11-13T09:45:00Z",
+  "version": "1.3.9",
+  "tag": "1.3.9"",
+  "date": "20.11.2026",
+  "releasedAt": "2026-11-20T07:27:00Z",
   "repository": "https://github.com/Astapovo/Smenasps",
   "pagesUrl": "https://astapovo.github.io/Smenasps/",
-  "releaseUrl": "https://github.com/Astapovo/Smenasps/releases/tag/v1.3.8",
-  "title": "SmenaSps v1.3.8 — Кнопка «NEW» по центру панели, правый сайдбар на широком экране, компактный график и списки",
+  "releaseUrl": "https://github.com/Astapovo/Smenasps/releases/tag/v.1.3.9",
+  "title": "SmenaSps v1.3.9 ",
   "changelog": [
+    "НОВЫЙ ПАКЕТ ИКОНОК"
     "Кнопка «NEW» расположена в центре нижней панели между вкладками «Знания» и «Смена» (отображается только при открытой странице «Журнал»).",
     "На широком экране (ПК / планшет) панель навигации переходит на правую сторону экрана для удобного доступа к кнопке «NEW» и вкладкам.",
     "Кнопка «Отчёты» вынесена в верхнюю шапку после кнопки синхронизации.",
