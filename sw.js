@@ -1,5 +1,5 @@
-// SmenaSps v1.3.8 — resilient offline-first service worker
-const APP_VERSION = '1.3.8';
+// SmenaSps v1.3.9 — resilient offline-first service worker
+const APP_VERSION = '1.3.9';
 const CACHE_NAME = `smenasps-${APP_VERSION}-cache`;
 const CORE_ASSETS = [
   './',
@@ -14,7 +14,10 @@ const CORE_ASSETS = [
   './icons/apple-touch-icon.png',
   './icons/icon.svg',
   './icons/favicon.svg',
-  './icons/favicon.ico'
+  './icons/favicon.ico',
+  './icons/favicon-64.png',
+  './icons/favicon-32.png',
+  './icons/favicon-16.png'
 ];
 
 async function fetchWithTimeout(request, timeoutMs = 3500) {
